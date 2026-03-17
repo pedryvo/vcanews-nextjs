@@ -2,12 +2,14 @@ import { blogPostRepository } from "@/repositories/blog-post-repository";
 export const dynamic = "force-dynamic";
 import NewsTimeline from "@/components/NewsTimeline";
 import { newsSyncService } from "@/services/news-sync-service";
+import { Analytics } from "@vercel/analytics/next"
 
 export default async function Home() {
   const initialNews = await blogPostRepository.getLatest(12);
 
   return (
     <div className="container mx-auto py-8 px-4">
+      <Analytics />
       <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-4 text-balance">
