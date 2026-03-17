@@ -5,14 +5,14 @@ import { useSearchParams } from "next/navigation";
 import { AdCard } from "@/components/Shop/AdCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from "@/components/ui/select";
-import { Loader2, Search, Filter, SlidersHorizontal, ChevronLeft, ChevronRight, ShoppingBag, Plus } from "lucide-react";
+import { Loader2, Search, Filter, SlidersHorizontal, ChevronLeft, ChevronRight, ShoppingBag, Plus, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useSession } from "next-auth/react";
 import {
@@ -123,12 +123,12 @@ function MarketplaceContent() {
                   <DialogHeader className="mb-6">
                     <DialogTitle className="text-2xl font-black uppercase tracking-tighter italic text-center">Novo Anúncio</DialogTitle>
                   </DialogHeader>
-                  <AdForm 
+                  <AdForm
                     onSuccess={() => {
                       setAdFormOpen(false);
                       fetchAds();
-                    }} 
-                    onCancel={() => setAdFormOpen(false)} 
+                    }}
+                    onCancel={() => setAdFormOpen(false)}
                   />
                 </DialogContent>
               </Dialog>
@@ -137,14 +137,25 @@ function MarketplaceContent() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 -mt-8">
+      <div className="container mx-auto px-4 -mt-8 space-y-6">
+        {/* Banner de Segurança */}
+        <div className="bg-black rounded-[2rem] p-6 text-white shadow-xl shadow-black/10 flex flex-col md:flex-row items-center gap-4 border-b-4 border-zinc-800">
+          <div className="h-12 w-12 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+            <ShieldCheck className="h-8 w-8 text-white" />
+          </div>
+          <div className="text-center md:text-left">
+            <h3 className="text-lg font-black uppercase tracking-tighter leading-tight">Compromisso VCA: <span className="text-orange-500 italic">Segurança em primeiro lugar</span></h3>
+            <p className="text-xs font-medium opacity-90">Sempre se certifique de que o produto ou serviço foi entregue antes de realizar o pagamento.</p>
+          </div>
+        </div>
+
         {/* Barra de Filtros */}
         <div className="bg-background rounded-[2rem] shadow-2xl border-2 p-6 md:p-8 space-y-6">
           <div className="flex flex-col lg:flex-row gap-4 items-end">
             <div className="w-full lg:w-1/4 space-y-2">
               <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Categoria</label>
-              <Select 
-                value={filters.categoryId} 
+              <Select
+                value={filters.categoryId}
                 onValueChange={(val) => setFilters(prev => ({ ...prev, categoryId: val, subcategoryId: "all", page: 1 }))}
               >
                 <SelectTrigger className="h-12 rounded-2xl border-2 font-bold focus:ring-primary/20 transition-all">
@@ -161,8 +172,8 @@ function MarketplaceContent() {
 
             <div className="w-full lg:w-1/4 space-y-2">
               <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Subcategoria</label>
-              <Select 
-                value={filters.subcategoryId} 
+              <Select
+                value={filters.subcategoryId}
                 disabled={filters.categoryId === "all"}
                 onValueChange={(val) => setFilters(prev => ({ ...prev, subcategoryId: val, page: 1 }))}
               >
@@ -181,8 +192,8 @@ function MarketplaceContent() {
             <div className="w-full lg:flex-1 grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Preço Mín.</label>
-                <Input 
-                  type="number" 
+                <Input
+                  type="number"
                   placeholder="R$ 0,00"
                   className="h-12 rounded-2xl border-2 font-bold focus:ring-primary/20 transition-all"
                   value={filters.minPrice}
@@ -191,8 +202,8 @@ function MarketplaceContent() {
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Preço Máx.</label>
-                <Input 
-                  type="number" 
+                <Input
+                  type="number"
                   placeholder="R$ Máx"
                   className="h-12 rounded-2xl border-2 font-bold focus:ring-primary/20 transition-all"
                   value={filters.maxPrice}
@@ -201,7 +212,7 @@ function MarketplaceContent() {
               </div>
             </div>
 
-            <Button 
+            <Button
               variant="outline"
               className="h-12 w-full lg:w-auto px-8 rounded-2xl border-2 font-black uppercase tracking-wider gap-2 hover:bg-muted"
               onClick={() => setFilters({ categoryId: "all", subcategoryId: "all", minPrice: "", maxPrice: "", page: 1 })}
@@ -233,7 +244,7 @@ function MarketplaceContent() {
                 <h3 className="text-2xl font-black uppercase tracking-tighter">Nenhum anúncio encontrado</h3>
                 <p className="text-muted-foreground max-w-xs mx-auto text-sm font-medium">Tente ajustar seus filtros para encontrar o que procura.</p>
               </div>
-              <Button 
+              <Button
                 onClick={() => setFilters({ categoryId: "all", subcategoryId: "all", minPrice: "", maxPrice: "", page: 1 })}
                 className="rounded-2xl h-12 px-8 font-black uppercase tracking-widest"
               >
@@ -261,9 +272,8 @@ function MarketplaceContent() {
                 <Button
                   key={p}
                   variant={pagination.page === p ? "default" : "outline"}
-                  className={`h-12 w-12 rounded-2xl border-2 font-black text-xs ${
-                    pagination.page === p ? "shadow-lg shadow-primary/20" : ""
-                  }`}
+                  className={`h-12 w-12 rounded-2xl border-2 font-black text-xs ${pagination.page === p ? "shadow-lg shadow-primary/20" : ""
+                    }`}
                   onClick={() => handlePageChange(p)}
                 >
                   {p}
