@@ -8,7 +8,7 @@ const globalForPrisma = globalThis as unknown as {
 
 // PostgreSQL standard client initialization with Driver Adapter
 // This is required for serverless/Edge contexts in Prisma 7
-const connectionString = process.env.DATABASE_URL;
+const connectionString = process.env.NEON_DATABASE_URL;
 
 if (!connectionString) {
   console.error("CRITICAL: DATABASE_URL is not defined in the environment!");
@@ -16,9 +16,9 @@ if (!connectionString) {
   console.log("Database connection initializing...");
 }
 
-const pool = new Pool({ 
+const pool = new Pool({
   connectionString,
-  max: 1, 
+  max: 1,
   connectionTimeoutMillis: 15000, // Aumentado para 15s (Neon cold start)
   ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
   idleTimeoutMillis: 30000,
