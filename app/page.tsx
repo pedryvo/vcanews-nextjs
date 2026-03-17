@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import NewsTimeline from "@/components/NewsTimeline";
 import { newsSyncService } from "@/services/news-sync-service";
 import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import Link from "next/link";
 import { AlertTriangle, ArrowRight, Briefcase, User as UserIcon, Sparkles, ShoppingBag } from "lucide-react";
 import { getServerSession } from "next-auth";
@@ -12,7 +13,7 @@ import { prisma } from "@/lib/db";
 export default async function Home() {
   const initialNews = await blogPostRepository.getLatest(12);
   const session = await getServerSession(authOptions as any) as any;
-  
+
   let showProfileCTA = false;
   let ctaTitle = "Crie seu Perfil Profissional";
   let ctaDescription = "Apareça no nosso guia para ser encontrado por clientes e receber orçamentos directos via chat!";
@@ -40,6 +41,7 @@ export default async function Home() {
   return (
     <div className="container mx-auto py-8 px-4">
       <Analytics />
+      <SpeedInsights />
       <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-4 text-balance">
