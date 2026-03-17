@@ -45,3 +45,6 @@ prisma/dev.db
 
 # uploads
 public/uploads
+
+# prisma generated client
+lib/generated
