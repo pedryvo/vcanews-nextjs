@@ -12,7 +12,12 @@ export default function MobileFooter() {
   const handleHomeClick = (e: React.MouseEvent) => {
     if (pathname === "/") {
       e.preventDefault();
-      window.location.reload();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      // Pequeno delay para o scroll suave começar antes do reload, 
+      // ou apenas dar o reload que já resolve o "novas notícias"
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
     }
   };
 
