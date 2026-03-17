@@ -10,6 +10,7 @@ export async function GET(request: NextRequest) {
     const posts = await blogPostRepository.getPaged(take, skip);
     return NextResponse.json(posts);
   } catch (error) {
+    console.error("API Error fetching posts:", error);
     return NextResponse.json({ error: "Failed to fetch posts" }, { status: 500 });
   }
 }

@@ -33,7 +33,19 @@ export default function NewsTimeline({ initialPosts }: NewsTimelineProps) {
     try {
       const take = 12;
       const response = await fetch(`/api/posts?skip=${skip}&take=${take}`);
+      
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
       const newPosts = await response.json();
+
+      // Verifica se newPosts é realmente um array para evitar crash
+      if (!Array.isArray(newPosts)) {
+        console.error("API did not return an array:", newPosts);
+        setHasMore(false);
+        return;
+      }
 
       if (newPosts.length === 0) {
         setHasMore(false);
@@ -42,8 +54,9 @@ export default function NewsTimeline({ initialPosts }: NewsTimelineProps) {
 
       setPosts((prev) => {
         // Filtra para garantir que não adicionamos posts repetidos por ID
+        // Proteção extra contra posts nulos ou inválidos
         const existingIds = new Set(prev.map(p => p.id));
-        const uniqueNewPosts = newPosts.filter((p: any) => !existingIds.has(p.id));
+        const uniqueNewPosts = newPosts.filter((p: any) => p && p.id && !existingIds.has(p.id));
         
         if (uniqueNewPosts.length === 0 && newPosts.length > 0) {
           // Se todos os posts retornados já existem, talvez a lista tenha "andado"
