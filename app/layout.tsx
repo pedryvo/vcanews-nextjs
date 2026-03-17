@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     siteName: "VCANews",
     images: [
       {
-        url: "/Bandeira_Vitoria_da_Conquista.svg",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "VCANews - Notícias de Vitória da Conquista",
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "VCANews - Notícias de Vitória da Conquista",
     description: "As principais notícias de Vitória da Conquista e região em um só lugar.",
-    images: ["/Bandeira_Vitoria_da_Conquista.svg"],
+    images: ["/og-image.png"],
   },
 };
 
