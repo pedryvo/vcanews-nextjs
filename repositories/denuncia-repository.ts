@@ -43,13 +43,19 @@ export const denunciaRepository = {
     return prisma.denuncia.delete({ where: { id } });
   },
 
-  async getAll() {
+  async getAll(skip?: number, take?: number) {
     return prisma.denuncia.findMany({
+      skip,
+      take,
       include: {
         user: { select: { id: true, name: true, image: true } },
         _count: { select: { reactions: true } },
       },
       orderBy: { createdAt: "desc" },
     });
+  },
+
+  async count() {
+    return prisma.denuncia.count();
   },
 };
