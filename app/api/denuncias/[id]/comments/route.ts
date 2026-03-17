@@ -22,22 +22,10 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const isDev = process.env.NODE_ENV === "development";
-  const session = isDev
-    ? { user: { id: "dev-user", name: "Dev Admin" } }
-    : await getServerSession(authOptions as any);
+  const session = await getServerSession(authOptions as any);
 
   if (!(session as any)?.user) {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
-  }
-
-  // Em dev, garante que o usuário fake existe no banco (foreign key)
-  if (isDev) {
-    await prisma.user.upsert({
-      where: { id: "dev-user" },
-      update: {},
-      create: { id: "dev-user", name: "Dev Admin", email: "dev@dev.com" },
-    });
   }
 
   try {

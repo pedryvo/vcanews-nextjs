@@ -15,10 +15,7 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const isDev = process.env.NODE_ENV === "development";
-  const session = isDev
-    ? { user: { id: "dev-user", role: "ADMIN", name: "Dev Admin", email: "dev@dev.com" } }
-    : await getServerSession(authOptions as any);
+  const session = await getServerSession(authOptions as any);
 
   if (!(session as any)?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -30,15 +27,6 @@ export async function POST(req: Request) {
   }
 
   const user = (session as any).user;
-
-  // Em dev, garante que o usuário fake existe no banco (foreign key)
-  if (isDev) {
-    await prisma.user.upsert({
-      where: { id: "dev-user" },
-      update: {},
-      create: { id: "dev-user", name: "Dev Admin", email: "dev@dev.com" },
-    });
-  }
 
   const denuncia = await denunciaRepository.create({
     titulo: titulo.trim(),

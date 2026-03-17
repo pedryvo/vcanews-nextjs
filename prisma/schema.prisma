@@ -1,9 +1,9 @@
-datasource db {
-  provider = "postgresql"
+generator client {
+  provider = "prisma-client-js"
 }
 
-generator client {
-  provider   = "prisma-client-js"
+datasource db {
+  provider = "postgresql"
 }
 
 model Cidade {
@@ -13,12 +13,12 @@ model Cidade {
 }
 
 model Blog {
-  id     Int        @id @default(autoincrement())
-  nome   String
-  rssUrl String     @unique
+  id       Int        @id @default(autoincrement())
+  nome     String
+  rssUrl   String     @unique
   cidadeId Int
-  cidade Cidade     @relation(fields: [cidadeId], references: [id])
-  posts  BlogPost[]
+  cidade   Cidade     @relation(fields: [cidadeId], references: [id])
+  posts    BlogPost[]
 }
 
 model BlogPost {
@@ -28,26 +28,25 @@ model BlogPost {
   imageUrl       String?
   dataPublicacao DateTime
   blogId         Int
-  blog           Blog     @relation(fields: [blogId], references: [id])
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  blog           Blog     @relation(fields: [blogId], references: [id])
 }
 
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?
-  access_token       String?
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?
-  session_state      String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -61,43 +60,62 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String      @id @default(cuid())
   name          String?
-  email         String?   @unique
+  email         String?     @unique
   emailVerified DateTime?
   image         String?
-  role          String    @default("USER")
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  role          String      @default("USER")
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  bio           String?
+  professionId  String?
+  username      String?     @unique
+  coverImage    String?
   accounts      Account[]
-  sessions      Session[]
+  comments      Comment[]
   denuncias     Denuncia[]
   reactions     Reaction[]
-  comments      Comment[]
+  sessions      Session[]
+  profession    Profession? @relation(fields: [professionId], references: [id])
+}
+
+model ProfessionCategory {
+  id          String       @id @default(cuid())
+  name        String       @unique
+  professions Profession[]
+}
+
+model Profession {
+  id         String             @id @default(cuid())
+  name       String             @unique
+  categoryId String
+  category   ProfessionCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  users      User[]
 }
 
 model Denuncia {
   id        String     @id @default(cuid())
   titulo    String
   descricao String
-  imageUrl  String?
   aprovado  Boolean    @default(false)
   userId    String
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
-  reactions Reaction[]
+  imageUrl  String?
   comments  Comment[]
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reactions Reaction[]
 }
 
 model Reaction {
   id         String   @id @default(cuid())
   userId     String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   denunciaId String
-  denuncia   Denuncia @relation(fields: [denunciaId], references: [id], onDelete: Cascade)
-  type       String   // "LIKE" or "UNLIKE"
+  type       String
   createdAt  DateTime @default(now())
+  denuncia   Denuncia @relation(fields: [denunciaId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, denunciaId])
 }
@@ -106,11 +124,11 @@ model Comment {
   id         String   @id @default(cuid())
   text       String
   userId     String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   denunciaId String
-  denuncia   Denuncia @relation(fields: [denunciaId], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+  denuncia   Denuncia @relation(fields: [denunciaId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
@@ -122,7 +140,7 @@ model VerificationToken {
 }
 
 model SyncLog {
-  id        Int      @id @default(1)
-  lastSync  DateTime @default(now())
-  status    String   @default("SUCCESS")
+  id       Int      @id @default(1)
+  lastSync DateTime @default(now())
+  status   String   @default("SUCCESS")
 }

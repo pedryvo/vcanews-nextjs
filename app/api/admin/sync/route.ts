@@ -4,15 +4,14 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { newsSyncService } from "@/services/news-sync-service";
 
 export async function POST() {
-  const isDev = process.env.NODE_ENV === "development";
-  const session = !isDev ? await getServerSession(authOptions) : { user: { email: "dev@local", role: "ADMIN" } };
+  const session = await getServerSession(authOptions as any);
 
-  if (!isDev && (!session || (session as any).user.role !== "ADMIN")) {
+  if (!(session as any) || (session as any).user.role !== "ADMIN") {
     return new Response("Unauthorized", { status: 401 });
   }
 
   try {
-    console.log(`[SYNC] Sincronização manual iniciada por: ${session.user.email}`);
+    console.log(`[SYNC] Sincronização manual iniciada por: ${(session as any).user.email}`);
     await newsSyncService.sync();
     return NextResponse.json({ message: "Sincronização concluída com sucesso!" });
   } catch (error) {

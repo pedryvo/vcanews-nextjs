@@ -7,9 +7,7 @@ import { put } from "@vercel/blob";
 
 export async function POST(req: Request) {
   const isDev = process.env.NODE_ENV === "development";
-  const session = isDev
-    ? { user: { id: "dev-user", role: "ADMIN" } }
-    : await getServerSession(authOptions as any);
+  const session = await getServerSession(authOptions as any);
 
   if (!(session as any)?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

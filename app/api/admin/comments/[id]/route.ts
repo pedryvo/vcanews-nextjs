@@ -7,10 +7,7 @@ export async function DELETE(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const isDev = process.env.NODE_ENV === "development";
-  const session = isDev
-    ? { user: { id: "dev-user", role: "ADMIN", name: "Dev Admin" } }
-    : await getServerSession(authOptions as any);
+  const session = await getServerSession(authOptions as any);
 
   if ((session as any)?.user?.role !== "ADMIN") {
     return NextResponse.json({ error: "Não autorizado" }, { status: 403 });

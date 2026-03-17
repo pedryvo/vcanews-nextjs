@@ -11,15 +11,22 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, LayoutDashboard, LogIn } from "lucide-react";
+import { LogOut, LayoutDashboard, LogIn, User as UserIcon, Settings } from "lucide-react";
 import Link from "next/link";
 
 export function UserNav() {
-  const { data: realSession, status: realStatus } = useSession();
-  
+  const { data: session, status } = useSession();
   const isDev = process.env.NODE_ENV === "development";
-  const session = isDev ? (realSession || { user: { name: "Dev Admin", email: "dev@local", role: "ADMIN", image: "" } }) : realSession;
-  const status = isDev ? "authenticated" : realStatus;
+
+  const handleLogin = () => {
+    if (isDev) {
+      signIn("credentials", { callbackUrl: "/" });
+    } else {
+      signIn("google");
+    }
+  };
+
+  // ... (existing code omitido)
 
   if (status === "loading") {
     return <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />;
@@ -31,7 +38,7 @@ export function UserNav() {
       <Button 
         variant="default" 
         size="sm" 
-        onClick={() => signIn("google")}
+        onClick={handleLogin}
         className="rounded-full gap-2 font-black tracking-widest bg-yellow-400 hover:bg-yellow-500 text-black border-b-4 border-yellow-600 active:border-b-0 active:translate-y-1 transition-all shadow-lg"
       >
         <LogIn className="h-4 w-4" />
@@ -84,6 +91,26 @@ export function UserNav() {
             </div>
           </DropdownMenuLabel>
           
+          <DropdownMenuSeparator className="my-2" />
+          
+          <DropdownMenuItem asChild className="cursor-pointer rounded-xl py-3 focus:bg-primary/10 focus:text-primary group">
+            <Link href={session.user?.username ? `/user/${session.user.username}` : "/settings/profile"} className="flex w-full items-center gap-3 font-semibold">
+              <div className="p-2 rounded-lg bg-primary/5 group-focus:bg-primary/20 transition-colors">
+                <UserIcon className="h-4 w-4" />
+              </div>
+              Meu Perfil Público
+            </Link>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem asChild className="cursor-pointer rounded-xl py-3 focus:bg-primary/10 focus:text-primary group">
+            <Link href="/settings/profile" className="flex w-full items-center gap-3 font-semibold">
+              <div className="p-2 rounded-lg bg-primary/5 group-focus:bg-primary/20 transition-colors">
+                <Settings className="h-4 w-4" />
+              </div>
+              Configurações
+            </Link>
+          </DropdownMenuItem>
+
           {session.user?.role === "ADMIN" && (
             <>
               <DropdownMenuSeparator className="my-2" />

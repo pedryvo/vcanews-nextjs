@@ -4,8 +4,6 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { denunciaRepository } from "@/repositories/denuncia-repository";
 
 async function getAdminSession() {
-  const isDev = process.env.NODE_ENV === "development";
-  if (isDev) return { user: { role: "ADMIN" } };
   const session = await getServerSession(authOptions as any);
   if (!session || (session as any).user?.role !== "ADMIN") return null;
   return session;
