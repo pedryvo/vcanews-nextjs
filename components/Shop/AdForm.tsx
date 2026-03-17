@@ -118,7 +118,7 @@ export function AdForm({ onSuccess, onCancel, ad, apiUrl }: AdFormProps) {
       });
 
       if (res.ok) {
-        toast.success(ad ? "Anúncio atualizado!" : "Anúncio publicado com sucesso!");
+        toast.success(ad ? "Anúncio atualizado!" : "Seu anúncio será revisado e publicado em breve!");
         onSuccess();
       } else {
         const data = await res.json();
