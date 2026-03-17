@@ -12,9 +12,12 @@ export default function SignInPage() {
 
   const handleSignIn = async () => {
     setIsLoading(true);
+    // Garantir que o diálogo apareça antes do redirect começar
+    await new Promise(resolve => setTimeout(resolve, 800));
     try {
       await signIn("google", { callbackUrl: "/" });
     } catch (error) {
+      console.error("Login error:", error);
       setIsLoading(false);
     }
   };
