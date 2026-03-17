@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/db";
+import { pusherServer } from "@/lib/pusher";
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -54,18 +55,16 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       },
     });
 
-    // Notificar via Socket (Sino + Chat)
-    const io = (global as any).io;
-    if (io) {
-      // Para o chat aberto
-      io.to(id).emit("new-message", message);
-      // Para o sino (ponto vermelho)
-      io.to(`user-${otherUserId}`).emit("notification", {
-        type: "BUDGET_MESSAGE",
-        referenceId: id,
-        message: "Nova mensagem no chat de orçamento"
-      });
-    }
+    // Notificar via Pusher (Sino + Chat)
+    // Para o chat aberto
+    await pusherServer.trigger(id, "new-message", message);
+    
+    // Para o sino (ponto vermelho)
+    await pusherServer.trigger(`user-${otherUserId}`, "notification", {
+      type: "BUDGET_MESSAGE",
+      referenceId: id,
+      message: "Nova mensagem no chat de orçamento"
+    });
 
     return NextResponse.json(message);
   } catch (error) {
@@ -125,14 +124,11 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       data: { status },
     });
 
-    // Notificar mudança de status via Socket
-    const io = (global as any).io;
-    if (io) {
-      io.to(id).emit("conversation-status-updated", {
-        conversationId: id,
-        status,
-      });
-    }
+    // Notificar mudança de status via Pusher
+    await pusherServer.trigger(id, "conversation-status-updated", {
+      conversationId: id,
+      status,
+    });
 
     return NextResponse.json(updated);
   } catch (error) {

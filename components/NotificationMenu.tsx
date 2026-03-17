@@ -48,11 +48,15 @@ export function NotificationMenu() {
 
   useEffect(() => {
     if (socket && session) {
-      socket.on("notification", () => {
+      const channelName = `user-${(session as any).user.id}`;
+      const channel = socket.subscribe(channelName);
+      
+      channel.bind("notification", () => {
         fetchNotifications();
       });
+
       return () => {
-        socket.off("notification");
+        channel.unbind("notification");
       };
     }
   }, [socket, session]);

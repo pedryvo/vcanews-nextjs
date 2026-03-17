@@ -69,15 +69,15 @@ export default function ChatRoomPage({ params }: { params: Promise<{ id: string 
 
   useEffect(() => {
     if (socket && id) {
-      socket.emit("join-room", id);
+      const channel = socket.subscribe(id);
 
-      socket.on("new-message", (message: Message) => {
+      channel.bind("new-message", (message: Message) => {
         if (message.senderId !== ((session as any)?.user as any)?.id) {
           setMessages((prev) => [...prev, message]);
         }
       });
 
-      socket.on("conversation-status-updated", (data) => {
+      channel.bind("conversation-status-updated", (data: any) => {
         if (data.conversationId === id) {
           setConversation((prev: any) => ({ ...prev, status: data.status }));
           if (data.status === "FINISHED") {
@@ -87,8 +87,9 @@ export default function ChatRoomPage({ params }: { params: Promise<{ id: string 
       });
 
       return () => {
-        socket.off("new-message");
-        socket.off("conversation-status-updated");
+        channel.unbind("new-message");
+        channel.unbind("conversation-status-updated");
+        socket.unsubscribe(id);
       };
     }
   }, [socket, id, session]);

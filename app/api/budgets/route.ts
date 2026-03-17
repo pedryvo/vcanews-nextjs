@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/db";
+import { pusherServer } from "@/lib/pusher";
 
 export async function POST(req: Request) {
   try {
@@ -58,15 +59,12 @@ export async function POST(req: Request) {
       }
     });
 
-    // Notificar o destinatário via Socket
-    const io = (global as any).io;
-    if (io) {
-      io.to(`user-${receiverId}`).emit("notification", {
-        type: "NEW_BUDGET",
-        referenceId: conversation.id,
-        message: "Novo pedido de orçamento recebido!"
-      });
-    }
+    // Notificar o destinatário via Pusher
+    await pusherServer.trigger(`user-${receiverId}`, "notification", {
+      type: "NEW_BUDGET",
+      referenceId: conversation.id,
+      message: "Novo pedido de orçamento recebido!"
+    });
 
     return NextResponse.json(conversation);
   } catch (error) {
