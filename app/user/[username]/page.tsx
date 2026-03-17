@@ -13,7 +13,9 @@ import {
   MessageSquare,
   Slash,
   ChevronRight,
-  ShieldAlert
+  ChevronLeft,
+  ShieldAlert,
+  Camera
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -35,6 +37,7 @@ export default function PublicProfilePage({ params }: PublicProfileProps) {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [startingBudget, setStartingBudget] = useState(false);
+  const [activeSlide, setActiveSlide] = useState(0);
 
   useEffect(() => {
     async function fetchPublicProfile() {
@@ -257,16 +260,66 @@ export default function PublicProfilePage({ params }: PublicProfileProps) {
 
           {/* Coluna Direita: Informações Adicionais / Showcase */}
           <div className="lg:col-span-2 space-y-6">
-            <Card className="border-none shadow-xl rounded-[2rem] overflow-hidden">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-2xl font-black uppercase tracking-tighter italic">Galeria & Projetos</CardTitle>
-                <CardDescription className="text-xs font-medium uppercase tracking-widest">Breve: Showcase de serviços realizados</CardDescription>
-              </CardHeader>
-              <CardContent className="h-64 flex items-center justify-center bg-muted/30 border-2 border-dashed border-muted rounded-b-[2rem] m-6 mt-2">
-                <div className="text-center space-y-2 opacity-30">
-                  <Loader2 className="h-8 w-8 mx-auto animate-pulse" />
-                  <p className="text-xs font-black uppercase tracking-tighter">Módulo de portfólio em desenvolvimento</p>
+            <Card className="border-none shadow-xl rounded-[2rem] overflow-hidden group/gallery">
+              <CardHeader className="pb-2 flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="text-2xl font-black uppercase tracking-tighter italic">Galeria & Projetos</CardTitle>
+                  <CardDescription className="text-xs font-medium uppercase tracking-widest">Serviços e realizações do profissional</CardDescription>
                 </div>
+                {user.portfolio?.length > 1 && (
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      className="h-8 w-8 rounded-full border-2"
+                      onClick={() => setActiveSlide(prev => (prev === 0 ? user.portfolio.length - 1 : prev - 1))}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      className="h-8 w-8 rounded-full border-2"
+                      onClick={() => setActiveSlide(prev => (prev === user.portfolio.length - 1 ? 0 : prev + 1))}
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+              </CardHeader>
+              <CardContent className="p-6">
+                {user.portfolio && user.portfolio.length > 0 ? (
+                  <div className="space-y-4">
+                    <div className="relative aspect-[4/3] rounded-3xl overflow-hidden bg-muted group/item">
+                      <img 
+                        src={user.portfolio[activeSlide].url} 
+                        className="w-full h-full object-cover transition-all duration-500" 
+                        alt="Portfolio" 
+                      />
+                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 px-3 py-1.5 bg-black/40 backdrop-blur-md rounded-full border border-white/10">
+                        {user.portfolio.map((_: any, idx: number) => (
+                          <div 
+                            key={idx} 
+                            className={cn(
+                              "h-1.5 rounded-full transition-all duration-300",
+                              activeSlide === idx ? "w-6 bg-primary" : "w-1.5 bg-white/40"
+                            )}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="h-64 flex flex-col items-center justify-center bg-muted/30 border-2 border-dashed border-muted rounded-3xl text-center space-y-4">
+                    <div className="h-16 w-16 bg-muted rounded-full flex items-center justify-center">
+                      <Camera className="h-8 w-8 text-muted-foreground opacity-20" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Galeria Vazia</p>
+                      <p className="text-[10px] text-muted-foreground/60 max-w-[200px] mx-auto uppercase font-medium">Este profissional ainda não adicionou fotos ao seu portfólio.</p>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>

@@ -23,6 +23,9 @@ export async function GET(
           orderBy: { createdAt: "desc" },
           take: 5,
         },
+        portfolio: {
+          orderBy: { order: "asc" },
+        },
       },
     });
 
