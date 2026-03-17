@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { 
   Sheet, 
   SheetContent, 
@@ -19,6 +21,16 @@ export function SidebarMenu() {
   const [open, setOpen] = useState(false);
 
   const user = session?.user;
+  const pathname = usePathname();
+
+  const handleLogoClick = (e: React.MouseEvent) => {
+    if (pathname === "/") {
+      e.preventDefault();
+      setOpen(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.dispatchEvent(new CustomEvent("refresh-news"));
+    }
+  };
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -29,8 +41,10 @@ export function SidebarMenu() {
       </SheetTrigger>
       <SheetContent side="left" className="w-[300px] p-0 border-r-0 bg-background flex flex-col">
         <SheetHeader className="p-6 border-b text-left">
-          <SheetTitle className="text-2xl font-black italic uppercase tracking-tighter flex items-center gap-2 pr-1">
-            <span className="text-primary italic">VCA</span>NEWS
+          <SheetTitle asChild className="text-2xl font-black italic uppercase tracking-tighter flex items-center gap-2 pr-1">
+            <Link href="/" onClick={handleLogoClick}>
+              <span className="text-primary italic">VCA</span>NEWS
+            </Link>
           </SheetTitle>
         </SheetHeader>
         

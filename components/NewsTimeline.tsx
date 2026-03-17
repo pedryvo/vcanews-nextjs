@@ -81,12 +81,15 @@ export default function NewsTimeline({ initialPosts }: NewsTimelineProps) {
   };
 
   useEffect(() => {
-    const handleClearNews = () => {
+    const handleRefreshNews = () => {
       setPosts([]);
-      setHasMore(false);
+      setSkip(0);
+      setHasMore(true);
+      // O fetchMorePosts será disparado automaticamente pelo IntersectionObserver
+      // assim que o container esvaziar e o observerTarget ficar visível
     };
 
-    window.addEventListener("clear-news", handleClearNews);
+    window.addEventListener("refresh-news", handleRefreshNews);
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -102,7 +105,7 @@ export default function NewsTimeline({ initialPosts }: NewsTimelineProps) {
     }
 
     return () => {
-      window.removeEventListener("clear-news", handleClearNews);
+      window.removeEventListener("refresh-news", handleRefreshNews);
       if (observerTarget.current) {
         observer.unobserve(observerTarget.current);
       }

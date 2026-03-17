@@ -2,8 +2,19 @@
 
 import { Home, Megaphone, ShoppingBag, Users, User } from "lucide-react";
 import { NavItem } from "./NavItem";
+import { usePathname } from "next/navigation";
 
 export function BottomNavigation() {
+  const pathname = usePathname();
+
+  const handleHomeClick = (e: React.MouseEvent) => {
+    if (pathname === "/") {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.dispatchEvent(new CustomEvent("refresh-news"));
+    }
+  };
+
   return (
     <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-t pb-safe h-20">
       <nav className="container mx-auto px-4 h-full flex items-center justify-between">
@@ -12,6 +23,7 @@ export function BottomNavigation() {
           label="Início" 
           icon={Home} 
           variant="mobile-bottom" 
+          onClick={handleHomeClick}
         />
         
         <NavItem 

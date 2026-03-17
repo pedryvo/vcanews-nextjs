@@ -8,6 +8,7 @@ import { authOptions } from "@/lib/auth";
 import { userRepository } from "@/repositories/user-repository";
 
 import { ProfileCTA, ProfessionalGuideCTA, MarketplaceCTA, DenunciaCTA } from "@/components/HomeCTAs";
+import { ScrollToTop } from "@/components/navigation/ScrollToTop";
 
 export default async function Home() {
   const initialNews = await blogPostRepository.getLatest(12);
@@ -71,6 +72,8 @@ export default async function Home() {
       ) : (
         <NewsTimeline initialPosts={initialNews} />
       )}
+
+      <ScrollToTop />
     </div>
   );
 }
