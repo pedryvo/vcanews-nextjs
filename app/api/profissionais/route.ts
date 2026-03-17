@@ -5,16 +5,30 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const query = searchParams.get("q") || "";
+    const categoryId = searchParams.get("categoryId");
+    const professionId = searchParams.get("professionId");
+
+    const where: any = {
+      professionId: { not: null },
+      AND: [
+        {
+          OR: [
+            { name: { contains: query, mode: "insensitive" } },
+            { username: { contains: query, mode: "insensitive" } },
+            { profession: { name: { contains: query, mode: "insensitive" } } },
+          ],
+        }
+      ]
+    };
+
+    if (professionId && professionId !== "all") {
+      where.professionId = professionId;
+    } else if (categoryId && categoryId !== "all") {
+      where.profession = { categoryId };
+    }
 
     const professionals = await prisma.user.findMany({
-      where: {
-        professionId: { not: null },
-        OR: [
-          { name: { contains: query, mode: "insensitive" } },
-          { username: { contains: query, mode: "insensitive" } },
-          { profession: { name: { contains: query, mode: "insensitive" } } },
-        ],
-      },
+      where,
       select: {
         id: true,
         name: true,

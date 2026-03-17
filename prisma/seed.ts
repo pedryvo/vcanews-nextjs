@@ -170,6 +170,10 @@ async function main() {
         "Analista de Marketing",
       ],
     },
+    {
+      name: "Outros",
+      professions: ["Geral", "Outros"],
+    },
   ];
 
   const productCategories = [
