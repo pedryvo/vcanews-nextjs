@@ -30,16 +30,28 @@ export async function GET(req: Request) {
   const [users, total] = await Promise.all([
     (prisma as any).user.findMany({
       where,
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        image: true,
-        username: true,
-        createdAt: true,
-        isBlocked: true,
-      },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          image: true,
+          username: true,
+          bio: true,
+          professionId: true,
+          createdAt: true,
+          isBlocked: true,
+          profession: {
+            select: {
+              name: true,
+              category: {
+                select: {
+                  name: true
+                }
+              }
+            }
+          }
+        },
       orderBy: { createdAt: "desc" },
       skip,
       take: limit,

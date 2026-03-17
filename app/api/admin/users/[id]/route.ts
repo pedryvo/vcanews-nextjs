@@ -18,11 +18,15 @@ export async function PATCH(
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    const { role, isBlocked } = await req.json();
+    const { role, isBlocked, name, username, bio, professionId } = await req.json();
     
     const data: any = {};
     if (role && ["USER", "ADMIN"].includes(role)) data.role = role;
     if (typeof isBlocked === "boolean") data.isBlocked = isBlocked;
+    if (typeof name === "string") data.name = name;
+    if (typeof username === "string") data.username = username;
+    if (typeof bio === "string") data.bio = bio;
+    if (typeof professionId === "string" || professionId === null) data.professionId = professionId;
 
     if (Object.keys(data).length === 0) {
       return NextResponse.json({ error: "Nenhum dado para atualizar" }, { status: 400 });

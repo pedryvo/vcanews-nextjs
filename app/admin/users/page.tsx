@@ -26,6 +26,26 @@ import {
 import { toast } from "sonner";
 import { Pagination } from "@/components/admin/Pagination";
 import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Edit2, Briefcase } from "lucide-react";
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<any[]>([]);
@@ -34,6 +54,10 @@ export default function AdminUsersPage() {
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
   const limit = 50;
 
   const fetchUsers = async (page: number) => {
@@ -62,6 +86,19 @@ export default function AdminUsersPage() {
   useEffect(() => {
     fetchUsers(currentPage);
   }, [currentPage]);
+
+  useEffect(() => {
+    const fetchProfessions = async () => {
+      try {
+        const res = await fetch("/api/professions");
+        const data = await res.json();
+        setCategories(data);
+      } catch (error) {
+        console.error("Erro ao carregar profissões:", error);
+      }
+    };
+    fetchProfessions();
+  }, []);
 
   async function handleUpdateRole(id: string, currentRole: string) {
     const newRole = currentRole === "ADMIN" ? "USER" : "ADMIN";
@@ -110,6 +147,46 @@ export default function AdminUsersPage() {
       toast.error(error.error || "Erro ao alterar status de bloqueio.");
     }
   }
+
+  const handleEditUser = (user: any) => {
+    setSelectedUser({
+      ...user,
+      professionId: user.professionId || "none"
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedUser) return;
+    setIsSaving(true);
+
+    try {
+      const res = await fetch(`/api/admin/users/${selectedUser.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: selectedUser.name,
+          username: selectedUser.username,
+          bio: selectedUser.bio,
+          professionId: selectedUser.professionId === "none" ? null : selectedUser.professionId,
+        }),
+      });
+
+      if (res.ok) {
+        toast.success("Usuário atualizado com sucesso!");
+        setIsEditModalOpen(false);
+        fetchUsers(currentPage);
+      } else {
+        const error = await res.json();
+        toast.error(error.error || "Erro ao atualizar usuário.");
+      }
+    } catch (error) {
+      toast.error("Erro na requisição.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <AdminLayout>
@@ -172,6 +249,14 @@ export default function AdminUsersPage() {
                         <p className="text-[10px] text-slate-400 truncate font-bold uppercase tracking-tighter">
                           {user.email}
                         </p>
+                        {user.profession && (
+                          <div className="flex items-center gap-1 mt-1">
+                            <Briefcase className="h-2.5 w-2.5 text-blue-400" />
+                            <span className="text-[9px] font-black text-slate-500 uppercase tracking-tighter">
+                              {user.profession.name}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -182,6 +267,13 @@ export default function AdminUsersPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="rounded-2xl border-2 shadow-2xl p-1.5 w-52 z-[101]">
+                        <DropdownMenuItem 
+                          className="rounded-xl font-bold text-[10px] uppercase tracking-widest cursor-pointer gap-3 p-3"
+                          onClick={() => handleEditUser(user)}
+                        >
+                          <Edit2 className="h-4 w-4 text-blue-500" /> Editar Perfil
+                        </DropdownMenuItem>
+
                         <DropdownMenuItem 
                           className="rounded-xl font-bold text-[10px] uppercase tracking-widest cursor-pointer gap-3 p-3"
                           onClick={() => handleUpdateRole(user.id, user.role)}
@@ -259,6 +351,94 @@ export default function AdminUsersPage() {
             onPageChange={setCurrentPage}
         />
       </div>
+
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent className="max-w-2xl rounded-[2.5rem] p-8">
+          <DialogHeader>
+            <DialogTitle className="text-3xl font-black tracking-tighter uppercase mb-4">
+              Editar Perfil
+            </DialogTitle>
+          </DialogHeader>
+
+          {selectedUser && (
+            <form onSubmit={handleSaveUser} className="space-y-6">
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Nome Completo</Label>
+                  <Input 
+                    value={selectedUser.name || ""} 
+                    onChange={e => setSelectedUser({...selectedUser, name: e.target.value})}
+                    className="rounded-xl border-2 h-12 font-bold"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Username</Label>
+                  <Input 
+                    value={selectedUser.username || ""} 
+                    onChange={e => setSelectedUser({...selectedUser, username: e.target.value.toLowerCase().replace(/\s/g, '')})}
+                    className="rounded-xl border-2 h-12 font-bold"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Profissão / Categoria</Label>
+                <Select 
+                  value={selectedUser.professionId} 
+                  onValueChange={val => setSelectedUser({...selectedUser, professionId: val})}
+                >
+                  <SelectTrigger className="w-full h-12 rounded-xl border-2 font-bold">
+                    <SelectValue placeholder="Selecione uma profissão" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-80 rounded-2xl border-2 shadow-2xl">
+                    <SelectItem value="none" className="font-bold text-slate-400">Nenhuma</SelectItem>
+                    {categories.map(cat => (
+                      <SelectGroup key={cat.id}>
+                        <SelectLabel className="text-[10px] font-black uppercase tracking-widest bg-slate-50 py-2 px-3 text-slate-500">
+                          {cat.name}
+                        </SelectLabel>
+                        {cat.professions.map((prof: any) => (
+                          <SelectItem key={prof.id} value={prof.id} className="font-bold cursor-pointer">
+                            {prof.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Bio / Descrição</Label>
+                <Textarea 
+                  value={selectedUser.bio || ""} 
+                  onChange={e => setSelectedUser({...selectedUser, bio: e.target.value})}
+                  className="rounded-2xl border-2 min-h-[120px] font-medium"
+                  placeholder="Conte um pouco sobre este usuário..."
+                />
+              </div>
+
+              <DialogFooter className="pt-4 border-t-2 border-slate-50 border-dashed">
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  onClick={() => setIsEditModalOpen(false)}
+                  className="rounded-xl font-black uppercase tracking-widest text-[10px] h-12"
+                >
+                  Cancelar
+                </Button>
+                <Button 
+                  type="submit" 
+                  disabled={isSaving}
+                  className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest text-[10px] h-12 px-8 shadow-xl shadow-blue-500/20"
+                >
+                  {isSaving ? "Salvando..." : "Salvar Alterações"}
+                </Button>
+              </DialogFooter>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 }
