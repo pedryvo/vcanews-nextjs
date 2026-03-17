@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+export const dynamic = "force-dynamic";
 import { blogRepository } from "@/repositories/blog-repository";
 
 export async function GET() {

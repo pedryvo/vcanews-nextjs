@@ -1,4 +1,5 @@
 import AdminLayout from "@/components/admin/AdminLayout";
+export const dynamic = "force-dynamic";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building2, Rss, Newspaper } from "lucide-react";
 import { cidadeRepository } from "@/repositories/cidade-repository";

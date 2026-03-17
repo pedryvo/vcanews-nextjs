@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+export const dynamic = "force-dynamic";
 import { cidadeRepository } from "@/repositories/cidade-repository";
 
 export async function GET() {

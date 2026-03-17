@@ -1,4 +1,5 @@
 import AdminLayout from "@/components/admin/AdminLayout";
+export const dynamic = "force-dynamic";
 import { blogPostRepository } from "@/repositories/blog-post-repository";
 import { blogRepository } from "@/repositories/blog-repository";
 import {

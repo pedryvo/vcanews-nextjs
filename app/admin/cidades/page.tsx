@@ -1,4 +1,5 @@
 import AdminLayout from "@/components/admin/AdminLayout";
+export const dynamic = "force-dynamic";
 import { cidadeRepository } from "@/repositories/cidade-repository";
 import {
   Table,

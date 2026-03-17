@@ -1,4 +1,5 @@
 import { blogPostRepository } from "@/repositories/blog-post-repository";
+export const dynamic = "force-dynamic";
 import NewsTimeline from "@/components/NewsTimeline";
 
 export default async function Home() {
