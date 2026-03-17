@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.vcanews.com.br"),
   title: "VCANews - Notícias de Vitória da Conquista",
   description: "As principais notícias de Vitória da Conquista e região em um só lugar.",
   manifest: "/manifest.json",
@@ -22,6 +23,28 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: "default",
     title: "VCANews",
+  },
+  openGraph: {
+    title: "VCANews - Notícias de Vitória da Conquista",
+    description: "As principais notícias de Vitória da Conquista e região em um só lugar.",
+    url: "https://www.vcanews.com.br",
+    siteName: "VCANews",
+    images: [
+      {
+        url: "/Bandeira_Vitoria_da_Conquista.svg",
+        width: 1200,
+        height: 630,
+        alt: "VCANews - Notícias de Vitória da Conquista",
+      },
+    ],
+    locale: "pt_BR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "VCANews - Notícias de Vitória da Conquista",
+    description: "As principais notícias de Vitória da Conquista e região em um só lugar.",
+    images: ["/Bandeira_Vitoria_da_Conquista.svg"],
   },
 };
 
