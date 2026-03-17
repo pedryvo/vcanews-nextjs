@@ -327,12 +327,18 @@ export default function ProfileSettingsPage() {
                   <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
                     <FileText className="h-3 w-3" /> Biografia / Sobre Você
                   </label>
-                  <Textarea 
-                    value={formData.bio}
-                    onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
-                    placeholder="Conte um pouco sobre suas habilidades e o que você faz..."
-                    className="min-h-[120px] rounded-2xl bg-muted/20 border-2 resize-none p-4 focus-visible:ring-primary/20"
-                  />
+                  <div className="relative">
+                    <Textarea 
+                      value={formData.bio}
+                      onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
+                      placeholder="Conte um pouco sobre suas habilidades e o que você faz..."
+                      className="min-h-[120px] rounded-2xl bg-muted/20 border-2 resize-none p-4 focus-visible:ring-primary/20"
+                      maxLength={3000}
+                    />
+                    <div className="absolute bottom-3 right-3 text-[10px] font-bold text-muted-foreground/40 pointer-events-none">
+                      {formData.bio.length}/3000
+                    </div>
+                  </div>
                 </div>
 
                 <div className="pt-4 border-t">

@@ -45,6 +45,11 @@ export async function PATCH(req: Request) {
     const body = await req.json();
     const { name, bio, image, coverImage, professionId, username } = body;
 
+    // Validação de limite de bio
+    if (bio && bio.length > 3000) {
+      return NextResponse.json({ error: "Bio muito longa. Máximo 3000 caracteres." }, { status: 400 });
+    }
+
     // Validação básica de username se fornecido
     if (username) {
       const cleanUsername = username.toLowerCase().replace(/[^a-z0-9]/g, "");

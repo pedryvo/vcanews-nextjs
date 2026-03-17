@@ -55,17 +55,20 @@ export const authOptions = {
         token.id = user.id;
         token.role = user.role || "USER";
         token.username = (user as any).username;
+        token.isBlocked = (user as any).isBlocked;
       }
 
       // Se o update() for chamado no client, atualizamos o token com os dados novos do DB
-      if (trigger === "update") {
+      if (trigger === "update" || user) {
         const updatedUser = await prisma.user.findUnique({
-          where: { id: token.id }
+          where: { id: user?.id || token.id }
         });
         if (updatedUser) {
           token.username = updatedUser.username;
           token.name = updatedUser.name;
           token.picture = updatedUser.image;
+          token.birthDate = updatedUser.birthDate;
+          token.isBlocked = updatedUser.isBlocked;
         }
       }
 
@@ -80,8 +83,16 @@ export const authOptions = {
         session.user.id = token.id;
         session.user.role = token.role;
         session.user.username = token.username;
+        session.user.birthDate = token.birthDate;
+        session.user.isBlocked = token.isBlocked;
       }
       return session;
+    },
+    async signIn({ user }: any) {
+      if (user.isBlocked) {
+        throw new Error("Sua conta está bloqueada.");
+      }
+      return true;
     },
   },
   pages: {

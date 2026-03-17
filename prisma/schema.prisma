@@ -60,24 +60,31 @@ model Session {
 }
 
 model User {
-  id            String      @id @default(cuid())
-  name          String?
-  email         String?     @unique
-  emailVerified DateTime?
-  image         String?
-  role          String      @default("USER")
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  bio           String?
-  professionId  String?
-  username      String?     @unique
-  coverImage    String?
-  accounts      Account[]
-  comments      Comment[]
-  denuncias     Denuncia[]
-  reactions     Reaction[]
-  sessions      Session[]
-  profession    Profession? @relation(fields: [professionId], references: [id])
+  id               String               @id @default(cuid())
+  name             String?
+  email            String?              @unique
+  emailVerified    DateTime?
+  image            String?
+  role             String               @default("USER")
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  bio              String?
+  professionId     String?
+  username         String?              @unique
+  coverImage       String?
+  birthDate        DateTime?
+  isBlocked        Boolean              @default(false)
+  accounts         Account[]
+  comments         Comment[]
+  denuncias        Denuncia[]
+  reactions        Reaction[]
+  sessions         Session[]
+  profession       Profession?          @relation(fields: [professionId], references: [id])
+  notifications    Notification[]
+  sentBudgets      BudgetConversation[] @relation("SentBudgets")
+  receivedBudgets  BudgetConversation[] @relation("ReceivedBudgets")
+  blocksGiven      UserBlock[]          @relation("BlocksGiven")
+  blocksReceived   UserBlock[]          @relation("BlocksReceived")
 }
 
 model ProfessionCategory {
@@ -143,4 +150,47 @@ model SyncLog {
   id       Int      @id @default(1)
   lastSync DateTime @default(now())
   status   String   @default("SUCCESS")
+}
+
+model BudgetConversation {
+  id             String    @id @default(cuid())
+  senderId       String
+  receiverId     String
+  status         String    @default("OPEN") // "OPEN", "FINISHED"
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  lastMessageAt  DateTime?
+  messages       Message[]
+  sender         User      @relation("SentBudgets", fields: [senderId], references: [id])
+  receiver       User      @relation("ReceivedBudgets", fields: [receiverId], references: [id])
+}
+
+model Message {
+  id             String             @id @default(cuid())
+  conversationId String
+  senderId       String
+  content        String
+  createdAt      DateTime           @default(now())
+  conversation   BudgetConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String   // "COMMENT", "BUDGET_MESSAGE"
+  referenceId String   // ID da denúncia ou conversa
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserBlock {
+  id        String   @id @default(cuid())
+  blockerId String
+  blockedId String
+  createdAt DateTime @default(now())
+  blocker   User     @relation("BlocksGiven", fields: [blockerId], references: [id])
+  blocked   User     @relation("BlocksReceived", fields: [blockedId], references: [id])
+
+  @@unique([blockerId, blockedId])
 }

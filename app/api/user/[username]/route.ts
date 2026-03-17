@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/db";
 
 export async function GET(
@@ -30,7 +32,22 @@ export async function GET(
 
     // Remover email por privacidade
     const { email, ...publicUser } = user;
-    return NextResponse.json(publicUser);
+
+    const session = await getServerSession(authOptions as any);
+    let isBlockedByMe = false;
+    if (session?.user) {
+      const block = await prisma.userBlock.findUnique({
+        where: {
+          blockerId_blockedId: {
+            blockerId: (session.user as any).id,
+            blockedId: user.id,
+          },
+        },
+      });
+      isBlockedByMe = !!block;
+    }
+
+    return NextResponse.json({ ...publicUser, isBlockedByMe });
   } catch (error) {
     return NextResponse.json({ error: "Erro interno" }, { status: 500 });
   }

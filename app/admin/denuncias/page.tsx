@@ -106,54 +106,78 @@ function DenunciaAdminCard({ d, onAction, onDelete }: {
   onDelete: (id: string) => void;
 }) {
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between gap-2">
-          <CardTitle className="text-base">{d.titulo}</CardTitle>
-          <Badge variant="outline" className={d.aprovado
-            ? "shrink-0 text-green-600 border-green-400"
-            : "shrink-0 text-yellow-600 border-yellow-400"
-          }>
-            {d.aprovado ? "Publicada" : "Pendente"}
-          </Badge>
+    <Card className="overflow-hidden border-2 hover:border-primary/20 transition-all shadow-sm hover:shadow-md group">
+      <div className="flex flex-col md:flex-row min-h-[180px]">
+        {/* Lado Esquerdo: Conteúdo e Ações */}
+        <div className="flex-1 p-5 flex flex-col justify-between space-y-4">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <Avatar className="h-6 w-6 border">
+                  <AvatarImage src={d.user?.image ?? ""} />
+                  <AvatarFallback className="text-[10px] font-bold">{d.user?.name?.[0] ?? "?"}</AvatarFallback>
+                </Avatar>
+                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
+                  {d.user?.name ?? "Anônimo"} • {new Date(d.createdAt).toLocaleDateString("pt-BR")}
+                </span>
+              </div>
+              <Badge variant="outline" className={cn(
+                "rounded-full px-3 text-[10px] font-black uppercase tracking-tighter",
+                d.aprovado 
+                  ? "bg-green-500/10 text-green-600 border-green-500/20" 
+                  : "bg-amber-500/10 text-amber-600 border-amber-500/20"
+              )}>
+                {d.aprovado ? "Publicada" : "Pendente"}
+              </Badge>
+            </div>
+
+            <div className="space-y-1">
+              <h3 className="text-lg font-black uppercase tracking-tight leading-tight group-hover:text-primary transition-colors">
+                {d.titulo}
+              </h3>
+              <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed font-medium">
+                {d.descricao}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 pt-2 border-t border-dashed">
+            {!d.aprovado && (
+              <Button size="sm" className="h-8 rounded-full px-4 gap-2 bg-green-600 hover:bg-green-700 text-white font-bold text-[10px] uppercase tracking-wider"
+                onClick={() => onAction(d.id, "approve")}>
+                <Check className="h-3 w-3" /> Aprovar
+              </Button>
+            )}
+            {!d.aprovado && (
+              <Button size="sm" variant="destructive" className="h-8 rounded-full px-4 gap-2 font-bold text-[10px] uppercase tracking-wider"
+                onClick={() => onAction(d.id, "reject")}>
+                <X className="h-3 w-3" /> Rejeitar
+              </Button>
+            )}
+            <Button size="sm" variant="ghost"
+              className="h-8 rounded-full px-4 gap-2 text-destructive hover:bg-destructive/10 hover:text-destructive font-bold text-[10px] uppercase tracking-wider ml-auto"
+              onClick={() => onDelete(d.id)}>
+              <Trash2 className="h-3 w-3" /> Excluir
+            </Button>
+          </div>
         </div>
-        <div className="flex items-center gap-2 mt-1">
-          <Avatar className="h-5 w-5">
-            <AvatarImage src={d.user?.image ?? ""} />
-            <AvatarFallback className="text-[10px]">{d.user?.name?.[0] ?? "?"}</AvatarFallback>
-          </Avatar>
-          <span className="text-xs text-muted-foreground">
-            {d.user?.name ?? "Anônimo"} · {new Date(d.createdAt).toLocaleDateString("pt-BR")}
-          </span>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <p className="text-sm text-muted-foreground whitespace-pre-wrap">{d.descricao}</p>
+
+        {/* Lado Direito: Imagem (Proporção horizontal) */}
         {d.imageUrl && (
-          <div className="rounded-lg overflow-hidden border">
-            <img src={d.imageUrl} alt="Foto da denúncia" className="w-full object-cover" />
+          <div className="w-full md:w-[240px] lg:w-[320px] shrink-0 border-l relative group-hover:opacity-90 transition-opacity bg-muted overflow-hidden">
+            <img 
+              src={d.imageUrl} 
+              alt="Foto da denúncia" 
+              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-background/20 to-transparent pointer-events-none" />
           </div>
         )}
-        <div className="flex gap-2 flex-wrap">
-          {!d.aprovado && (
-            <Button size="sm" className="gap-2 bg-green-600 hover:bg-green-700 text-white"
-              onClick={() => onAction(d.id, "approve")}>
-              <Check className="h-4 w-4" /> Aprovar
-            </Button>
-          )}
-          {!d.aprovado && (
-            <Button size="sm" variant="destructive" className="gap-2"
-              onClick={() => onAction(d.id, "reject")}>
-              <X className="h-4 w-4" /> Rejeitar
-            </Button>
-          )}
-          <Button size="sm" variant="outline"
-            className="gap-2 text-destructive hover:bg-destructive hover:text-destructive-foreground ml-auto"
-            onClick={() => onDelete(d.id)}>
-            <Trash2 className="h-4 w-4" /> Excluir
-          </Button>
-        </div>
-      </CardContent>
+      </div>
     </Card>
   );
+}
+
+function cn(...inputs: any) {
+  return inputs.filter(Boolean).join(" ");
 }

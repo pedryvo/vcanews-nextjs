@@ -57,6 +57,7 @@ export const metadata: Metadata = {
 import Navbar from "@/components/Navbar";
 import MobileFooter from "@/components/MobileFooter";
 import { Providers } from "@/components/Providers";
+import { AgeGuard } from "@/components/AgeGuard";
 import { Toaster } from "sonner";
 
 export default function RootLayout({
@@ -71,10 +72,12 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <Providers>
-          <Navbar />
-          <main className="pb-20 lg:pb-0">{children}</main>
-          <MobileFooter />
-          <Toaster position="top-center" />
+          <AgeGuard>
+            <Navbar />
+            <main className="pb-20 lg:pb-0">{children}</main>
+            <MobileFooter />
+            <Toaster position="top-center" />
+          </AgeGuard>
         </Providers>
       </body>
     </html>

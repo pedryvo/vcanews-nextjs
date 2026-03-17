@@ -4,6 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { UserNav } from "@/components/UserNav"
+import { NotificationMenu } from "@/components/NotificationMenu"
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -42,10 +43,17 @@ export default function Navbar() {
             >
               DENÚNCIAS DA CIDADE
             </Link>
+            <Link
+              href="/profissionais"
+              className="text-xs font-bold px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-md transition-all uppercase tracking-tight shadow-sm border border-primary/20"
+            >
+              PROFISSIONAIS DE VCA
+            </Link>
           </div>
         </div>
 
         <div className="flex items-center gap-4">
+          <NotificationMenu />
           <UserNav />
         </div>
       </div>

@@ -40,6 +40,32 @@ export async function POST(
       denunciaId: id,
     });
 
+    // Notificar o autor da denúncia
+    const denuncia = await prisma.denuncia.findUnique({
+      where: { id },
+      select: { userId: true }
+    });
+
+    if (denuncia && denuncia.userId !== ((session as any).user as any).id) {
+      await prisma.notification.create({
+        data: {
+          userId: denuncia.userId,
+          type: "COMMENT",
+          referenceId: id,
+        }
+      });
+
+      // Notificar via Socket
+      const io = (global as any).io;
+      if (io) {
+        io.to(`user-${denuncia.userId}`).emit("notification", {
+          type: "COMMENT",
+          referenceId: id,
+          message: "Sua denúncia recebeu um novo comentário!"
+        });
+      }
+    }
+
     return NextResponse.json(comment);
   } catch (error) {
     return NextResponse.json({ error: "Erro ao salvar comentário" }, { status: 500 });

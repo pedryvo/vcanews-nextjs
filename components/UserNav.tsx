@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, LayoutDashboard, LogIn, User as UserIcon, Settings } from "lucide-react";
+import { LogOut, LayoutDashboard, LogIn, User as UserIcon, Settings, MessageSquare } from "lucide-react";
 import Link from "next/link";
 
 export function UserNav() {
@@ -93,6 +93,15 @@ export function UserNav() {
           
           <DropdownMenuSeparator className="my-2" />
           
+          <DropdownMenuItem asChild className="cursor-pointer rounded-xl py-3 focus:bg-primary/10 focus:text-primary group">
+            <Link href="/mensagens" className="flex w-full items-center gap-3 font-semibold">
+              <div className="p-2 rounded-lg bg-primary/5 group-focus:bg-primary/20 transition-colors">
+                <MessageSquare className="h-4 w-4" />
+              </div>
+              Minhas Mensagens
+            </Link>
+          </DropdownMenuItem>
+
           <DropdownMenuItem asChild className="cursor-pointer rounded-xl py-3 focus:bg-primary/10 focus:text-primary group">
             <Link href={session.user?.username ? `/user/${session.user.username}` : "/settings/profile"} className="flex w-full items-center gap-3 font-semibold">
               <div className="p-2 rounded-lg bg-primary/5 group-focus:bg-primary/20 transition-colors">

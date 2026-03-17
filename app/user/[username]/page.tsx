@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
+import { useSession } from "next-auth/react";
 import { 
   User as UserIcon, 
   MapPin, 
@@ -8,13 +9,19 @@ import {
   Briefcase, 
   AlertTriangle,
   ArrowLeft,
-  Loader2
+  Loader2,
+  MessageSquare,
+  Slash,
+  ChevronRight,
+  ShieldAlert
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 interface PublicProfileProps {
@@ -23,8 +30,11 @@ interface PublicProfileProps {
 
 export default function PublicProfilePage({ params }: PublicProfileProps) {
   const resolvedParams = use(params);
+  const router = useRouter();
+  const { data: session } = useSession();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [startingBudget, setStartingBudget] = useState(false);
 
   useEffect(() => {
     async function fetchPublicProfile() {
@@ -42,6 +52,56 @@ export default function PublicProfilePage({ params }: PublicProfileProps) {
     }
     fetchPublicProfile();
   }, [resolvedParams.username]);
+
+  const handleStartBudget = async () => {
+    if (!session) {
+      toast.error("Você precisa estar logado para fazer um orçamento.");
+      return;
+    }
+    
+    setStartingBudget(true);
+    try {
+      const res = await fetch("/api/budgets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ receiverId: user.id }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        router.push(`/mensagens/${data.id}`);
+      } else {
+        toast.error(data.error || "Erro ao iniciar conversa");
+      }
+    } catch (error) {
+      toast.error("Erro na conexão");
+    } finally {
+      setStartingBudget(false);
+    }
+  };
+
+  const handleBlockUser = async () => {
+    if (!session) return;
+    try {
+      const res = await fetch(`/api/user/block/${user.id}`, { method: "POST" });
+      if (res.ok) {
+        const data = await res.json();
+        const action = data.action === "blocked" ? "bloqueado" : "desbloqueado";
+        toast.success(`Usuário ${action} com sucesso.`);
+        
+        // Atualizar estado local
+        setUser((prev: any) => ({ ...prev, isBlockedByMe: data.action === "blocked" }));
+        
+        if (data.action === "blocked") {
+          router.push("/");
+        }
+      } else {
+        toast.error("Erro ao processar bloqueio");
+      }
+    } catch (error) {
+      toast.error("Erro na conexão");
+    }
+  };
 
   if (loading) {
     return (
@@ -66,6 +126,8 @@ export default function PublicProfilePage({ params }: PublicProfileProps) {
     );
   }
 
+  const isOwnProfile = session?.user?.id === user.id;
+
   return (
     <div className="min-h-screen bg-muted/30 pb-20">
       {/* Header do Perfil / Capa Premium */}
@@ -83,17 +145,21 @@ export default function PublicProfilePage({ params }: PublicProfileProps) {
       </div>
       
       <div className="container max-w-5xl mx-auto px-4">
-        <div className="-mt-20 md:-mt-32 mb-6 flex flex-col md:flex-row md:items-end gap-6 relative z-10">
-          <Avatar className="w-40 h-40 md:w-56 md:h-56 border-8 border-background shadow-2xl rounded-full">
-            <AvatarImage src={user.image || ""} className="object-cover" />
-            <AvatarFallback className="text-4xl bg-primary text-primary-foreground font-black">
-              {user.name?.[0] || "?"}
-            </AvatarFallback>
-          </Avatar>
+        <div className="flex flex-col md:flex-row md:items-end gap-6 relative z-10 pb-6">
+          {/* Avatar com margem negativa isolada */}
+          <div className="-mt-20 md:-mt-32">
+            <Avatar className="w-40 h-40 md:w-56 md:h-56 border-8 border-background shadow-2xl rounded-full">
+              <AvatarImage src={user.image || ""} className="object-cover" />
+              <AvatarFallback className="text-4xl bg-primary text-primary-foreground font-black">
+                {user.name?.[0] || "?"}
+              </AvatarFallback>
+            </Avatar>
+          </div>
           
-          <div className="flex-1 space-y-2 pb-2">
+          {/* Informações do usuário abaixo da linha da capa */}
+          <div className="flex-1 space-y-2 pt-2">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-3xl md:text-5xl font-black tracking-tighter uppercase whitespace-nowrap">
+              <h1 className="text-3xl md:text-5xl font-black tracking-tighter uppercase break-words">
                 {user.name}
               </h1>
               <Badge variant="secondary" className="bg-primary/10 text-primary border-none text-xs font-mono lowercase">
@@ -114,19 +180,48 @@ export default function PublicProfilePage({ params }: PublicProfileProps) {
               </div>
             </div>
           </div>
+
+          {!isOwnProfile && session && (
+            <div className="flex flex-wrap items-center gap-2 pt-4 md:pt-0">
+              <Button 
+                onClick={handleStartBudget} 
+                disabled={startingBudget}
+                className="rounded-2xl h-12 px-6 font-bold uppercase tracking-wider shadow-lg shadow-primary/20"
+              >
+                {startingBudget ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageSquare className="mr-2 h-4 w-4" />}
+                Faça um Orçamento
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={handleBlockUser}
+                className={cn(
+                  "h-12 rounded-2xl border-2 font-bold uppercase tracking-wider px-6 transition-all",
+                  user.isBlockedByMe 
+                    ? "bg-green-50 border-green-200 text-green-600 hover:bg-green-100" 
+                    : "border-destructive/20 text-destructive hover:bg-destructive/10"
+                )}
+              >
+                <Slash className="mr-2 h-4 w-4" />
+                {user.isBlockedByMe ? "Desbloquear" : "Bloquear"}
+              </Button>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Coluna Esquerda: Sobre */}
           <div className="lg:col-span-1 space-y-6">
-            <Card className="border-none shadow-xl rounded-3xl">
+            <Card className="border-none shadow-xl rounded-3xl overflow-hidden">
+              <div className="h-1.5 w-full bg-primary" />
               <CardHeader>
-                <CardTitle className="text-lg font-bold">Sobre</CardTitle>
+                <CardTitle className="text-lg font-bold flex items-center gap-2">
+                  <UserIcon className="h-4 w-4 text-primary" /> Sobre
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {user.bio ? (
-                  <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap italic">
-                    "{user.bio}"
+                  <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap text-justify break-words overflow-hidden">
+                    {user.bio}
                   </p>
                 ) : (
                   <p className="text-sm text-muted-foreground opacity-50 italic">
@@ -137,60 +232,43 @@ export default function PublicProfilePage({ params }: PublicProfileProps) {
                 {user.profession?.category && (
                   <div className="pt-4 border-t space-y-2">
                     <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Expertise em</span>
-                    <Badge variant="outline" className="w-full justify-center py-2 rounded-xl text-xs">
-                      {user.profession.category.name}
-                    </Badge>
+                    <div className="flex items-center justify-between p-3 bg-muted/50 rounded-2xl border">
+                      <span className="text-xs font-bold">{user.profession.category.name}</span>
+                      <ChevronRight className="h-4 w-4 opacity-20" />
+                    </div>
                   </div>
                 )}
               </CardContent>
             </Card>
+
+            <Card className="border-none shadow-xl rounded-3xl bg-primary text-primary-foreground overflow-hidden">
+              <CardContent className="p-6 space-y-4 text-center">
+                <ShieldAlert className="h-10 w-10 mx-auto opacity-50" />
+                <div className="space-y-1">
+                  <h4 className="font-black uppercase tracking-tighter">Compromisso VCA</h4>
+                  <p className="text-[10px] uppercase font-bold tracking-widest opacity-80">Segurança em primeiro lugar</p>
+                </div>
+                <p className="text-xs font-medium opacity-90">
+                  Sempre realize pagamentos fora da plataforma apenas após a prestação do serviço.
+                </p>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Coluna Direita: Atividade */}
+          {/* Coluna Direita: Informações Adicionais / Showcase */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-yellow-500" />
-                Denúncias Recentes
-              </h2>
-              <span className="text-xs font-bold text-muted-foreground uppercase">{user.denuncias?.length || 0} Publicadas</span>
-            </div>
-
-            {user.denuncias && user.denuncias.length > 0 ? (
-              <div className="grid gap-4">
-                {user.denuncias.map((denuncia: any) => (
-                  <Link key={denuncia.id} href={`/denuncias`}>
-                    <Card className="hover:border-primary/50 transition-all group overflow-hidden border-none shadow-lg">
-                      <CardContent className="p-0 flex flex-col md:flex-row h-full md:h-32">
-                        {denuncia.imageUrl && (
-                          <div className="w-full md:w-32 h-32 shrink-0">
-                            <img 
-                              src={denuncia.imageUrl} 
-                              alt="" 
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform" 
-                            />
-                          </div>
-                        )}
-                        <div className="p-4 flex flex-col justify-center gap-1 min-w-0">
-                          <h4 className="font-bold truncate text-sm md:text-base">{denuncia.titulo}</h4>
-                          <p className="text-xs text-muted-foreground line-clamp-2">{denuncia.descricao}</p>
-                          <span className="text-[10px] text-primary mt-1 font-mono">
-                            {new Date(denuncia.createdAt).toLocaleDateString("pt-BR")}
-                          </span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <Card className="border-dashed border-2 bg-transparent">
-                <CardContent className="py-20 text-center">
-                  <AlertTriangle className="h-10 w-10 mx-auto text-muted-foreground opacity-20 mb-4" />
-                  <p className="text-muted-foreground">Nenhuma denúncia feita por este usuário ainda.</p>
-                </CardContent>
-              </Card>
-            )}
+            <Card className="border-none shadow-xl rounded-[2rem] overflow-hidden">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-2xl font-black uppercase tracking-tighter italic">Galeria & Projetos</CardTitle>
+                <CardDescription className="text-xs font-medium uppercase tracking-widest">Breve: Showcase de serviços realizados</CardDescription>
+              </CardHeader>
+              <CardContent className="h-64 flex items-center justify-center bg-muted/30 border-2 border-dashed border-muted rounded-b-[2rem] m-6 mt-2">
+                <div className="text-center space-y-2 opacity-30">
+                  <Loader2 className="h-8 w-8 mx-auto animate-pulse" />
+                  <p className="text-xs font-black uppercase tracking-tighter">Módulo de portfólio em desenvolvimento</p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

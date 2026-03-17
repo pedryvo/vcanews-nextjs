@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { CommentSection } from "@/components/CommentSection";
+import Link from "next/link";
 
 type User = { id: string; name: string | null; image: string | null };
 type Reaction = { id: string; type: string; user: User };
@@ -99,7 +100,9 @@ export function DenunciaCard({ denuncia, currentUserId }: DenunciaCardProps) {
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <h3 className="font-semibold text-base leading-snug">{denuncia.titulo}</h3>
+            <Link href={`/denuncias/${denuncia.id}`}>
+              <h3 className="font-semibold text-base leading-snug hover:text-primary transition-colors cursor-pointer">{denuncia.titulo}</h3>
+            </Link>
             <div className="flex items-center gap-2 mt-1">
               <Avatar className="h-5 w-5">
                 <AvatarImage src={denuncia.user.image ?? ""} />
