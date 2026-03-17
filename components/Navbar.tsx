@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation"
 import { Menu, X, Mail } from "lucide-react"
 import { UserNav } from "@/components/UserNav"
 import { NotificationMenu } from "@/components/NotificationMenu"
+import { WeatherWidget } from "@/components/WeatherWidget"
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -72,6 +73,7 @@ export default function Navbar() {
 
         <div className="flex items-center gap-4">
           <div className="hidden md:flex items-center gap-4">
+            <WeatherWidget />
             <NotificationMenu />
             <UserNav />
           </div>
