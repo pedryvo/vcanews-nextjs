@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import sharp from "sharp";
 import { writeFile } from "fs/promises";
 import { join } from "path";
+import { put } from "@vercel/blob";
 
 export async function POST(req: Request) {
   const isDev = process.env.NODE_ENV === "development";
@@ -22,41 +22,30 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Nenhum arquivo enviado" }, { status: 400 });
   }
 
-  // Check file type
-  if (!file.type.startsWith("image/")) {
-    return NextResponse.json({ error: "Apenas imagens são aceitas" }, { status: 400 });
-  }
-
-  // Max size 10MB
-  if (file.size > 10 * 1024 * 1024) {
-    return NextResponse.json({ error: "Imagem muito grande (máx 10MB)" }, { status: 400 });
-  }
-
   const buffer = Buffer.from(await file.arrayBuffer());
-
-  // Process with sharp: resize to max 800px wide, convert to WebP
-  const processed = await sharp(buffer)
-    .resize(800, 600, {
-      fit: "inside",
-      withoutEnlargement: true,
-    })
-    .webp({ quality: 80 })
-    .toBuffer();
-
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.webp`;
 
   if (isDev) {
     // Save locally in public/uploads for dev
     const uploadPath = join(process.cwd(), "public", "uploads", filename);
-    await writeFile(uploadPath, processed);
+    await writeFile(uploadPath, buffer);
     return NextResponse.json({ url: `/uploads/${filename}` });
   } else {
     // Use Vercel Blob in production
-    const { put } = await import("@vercel/blob");
-    const blob = await put(`denuncias/${filename}`, processed, {
-      access: "public",
-      contentType: "image/webp",
-    });
-    return NextResponse.json({ url: blob.url });
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      console.error("ERRO: BLOB_READ_WRITE_TOKEN não configurado!");
+      return NextResponse.json({ error: "Configuração de upload incompleta no servidor" }, { status: 500 });
+    }
+
+    try {
+      const blob = await put(`denuncias/${filename}`, buffer, {
+        access: "public",
+        contentType: "image/webp",
+      });
+      return NextResponse.json({ url: blob.url });
+    } catch (error: any) {
+      console.error("Erro no Vercel Blob:", error);
+      return NextResponse.json({ error: "Erro ao salvar imagem no storage" }, { status: 500 });
+    }
   }
 }

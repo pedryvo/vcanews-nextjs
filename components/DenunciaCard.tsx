@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ThumbsUp, ThumbsDown, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -24,9 +24,14 @@ interface DenunciaCardProps {
 }
 
 export function DenunciaCard({ denuncia, currentUserId }: DenunciaCardProps) {
+  const [mounted, setMounted] = useState(false);
   const [reactions, setReactions] = useState<Reaction[]>(denuncia.reactions);
   const [showReactions, setShowReactions] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const likes = reactions.filter((r) => r.type === "LIKE");
   const unlikes = reactions.filter((r) => r.type === "UNLIKE");
@@ -65,11 +70,13 @@ export function DenunciaCard({ denuncia, currentUserId }: DenunciaCardProps) {
     }
   }
 
-  const dateStr = new Date(denuncia.createdAt).toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
+  const dateStr = mounted 
+    ? new Date(denuncia.createdAt).toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
+    : "";
 
   return (
     <Card className="border shadow-sm hover:shadow-md transition-shadow">
