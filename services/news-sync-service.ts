@@ -15,11 +15,13 @@ const parser = new Parser({
 export class NewsSyncService {
   async sync() {
     const blogs = await blogRepository.getAll();
+    console.log(`[SYNC] Iniciando sincronização. Blogs encontrados no banco: ${blogs.length}`);
 
     for (const blog of blogs) {
       try {
-        console.log(`Buscando notícias de: ${blog.nome} (${blog.rssUrl})`);
+        console.log(`[SYNC] Processando blog: ${blog.nome} (${blog.rssUrl})`);
         const feed = await parser.parseURL(blog.rssUrl);
+        console.log(`[SYNC] RSS processado. Items encontrados: ${feed.items?.length || 0}`);
 
         for (const item of feed.items) {
           if (!item.link || !item.title) continue;
@@ -27,29 +29,33 @@ export class NewsSyncService {
           // OTIMIZAÇÃO: Se já existe, pula o processamento pesado
           const exists = await blogPostRepository.existsByUrl(item.link);
           if (exists) {
-            // console.log(`Post já existe, pulando: ${item.title}`);
             continue;
           }
+
+          console.log(`[SYNC] Novo post encontrado: ${item.title}`);
 
           let imageUrl = this.extractImageUrlFromRSS(item);
           let titulo = item.title;
 
-          // Se não encontrou imagem no RSS, tenta extrair da página do post
-          // Ou se o título parecer truncado/incompleto (opcional, mas o usuário pediu título completo)
-          try {
-            const article = await extract(item.link);
-            if (article) {
-              if (!imageUrl && article.image) {
-                console.log(`Imagem extraída via article-extractor para: ${item.title}`);
-                imageUrl = article.image;
+          // OTIMIZAÇÃO: Só chama o extrator pesado se realmente precisar (falta imagem ou título curto)
+          const needsExtraction = !imageUrl || (titulo && titulo.length < 50);
+
+          if (needsExtraction) {
+            try {
+              const article = await extract(item.link);
+              if (article) {
+                if (!imageUrl && article.image) {
+                  console.log(`[SYNC] Imagem extraída via article-extractor para: ${item.title}`);
+                  imageUrl = article.image;
+                }
+                if (article.title && article.title.length > titulo.length) {
+                  // console.log(`Título aprimorado: ${article.title}`);
+                  titulo = article.title;
+                }
               }
-              if (article.title && article.title.length > titulo.length) {
-                console.log(`Título aprimorado: ${article.title}`);
-                titulo = article.title;
-              }
+            } catch (e) {
+              console.error(`[SYNC] Erro ao extrair metadados extras de ${item.link}:`, e);
             }
-          } catch (e) {
-            console.error(`Erro ao extrair metadados extras de ${item.link}:`, e);
           }
 
           const publishDate = item.pubDate ? new Date(item.pubDate) : new Date();
