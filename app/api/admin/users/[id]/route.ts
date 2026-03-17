@@ -49,7 +49,7 @@ export async function DELETE(
 
   try {
     // Impedir que um admin delete a si mesmo
-    if ((session.user as any).id === id) {
+    if ((session as any).user?.id === id) {
       return NextResponse.json({ error: "Você não pode deletar sua própria conta" }, { status: 400 });
     }
 
