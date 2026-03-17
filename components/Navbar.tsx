@@ -39,13 +39,13 @@ export default function Navbar() {
           <div className="hidden md:flex gap-6 items-center">
             <Link
               href="/denuncias"
-              className="text-xs font-bold px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-black rounded-md transition-all uppercase tracking-tight shadow-sm"
+              className="text-xs font-black px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-black rounded-md transition-all uppercase tracking-tight shadow-lg border-b-4 border-yellow-600 active:border-b-0 active:translate-y-0.5"
             >
               DENÚNCIAS DA CIDADE
             </Link>
             <Link
               href="/profissionais"
-              className="text-xs font-bold px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-md transition-all uppercase tracking-tight shadow-sm border border-primary/20"
+              className="text-xs font-black px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-all uppercase tracking-tight shadow-lg border-b-4 border-blue-800 active:border-b-0 active:translate-y-0.5"
             >
               PROFISSIONAIS DE VCA
             </Link>
