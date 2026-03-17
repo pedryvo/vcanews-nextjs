@@ -48,114 +48,191 @@ async function main() {
     {
       name: "Tecnologia & Programação",
       professions: [
+        "Desenvolvedor Frontend",
+        "Desenvolvedor Backend",
         "Desenvolvedor Full Stack",
         "Desenvolvedor Mobile",
-        "Designer de Interface (UI/UX)",
+        "Desenvolvedor React",
+        "Desenvolvedor Node.js",
+        "Desenvolvedor Ruby on Rails",
+        "Engenheiro de Software",
         "Analista de Sistemas",
-        "Técnico de Informática",
-        "Especialista em Redes",
+        "Administrador de Banco de Dados (DBA)",
         "Cientista de Dados",
+        "Engenheiro de Dados",
+        "Especialista em Inteligência Artificial",
+        "Especialista em Machine Learning",
+        "DevOps",
+        "Administrador de Redes",
+        "Especialista em Segurança da Informação",
+        "Técnico de Informática",
+        "Suporte Técnico",
         "Gestor de TI",
+        "QA / Testador de Software"
       ],
     },
     {
       name: "Saúde & Bem-estar",
       professions: [
-        "Médico Clinico Geral",
+        "Médico Clínico Geral",
+        "Médico Especialista",
         "Enfermeiro(a)",
+        "Técnico de Enfermagem",
         "Fisioterapeuta",
         "Psicólogo(a)",
+        "Psiquiatra",
         "Nutricionista",
-        "Personal Trainer",
         "Dentista",
+        "Ortodontista",
         "Fonoaudiólogo(a)",
+        "Terapeuta Ocupacional",
         "Massoterapeuta",
+        "Quiropraxista",
+        "Acupunturista",
+        "Personal Trainer",
+        "Instrutor de Yoga",
+        "Instrutor de Pilates"
       ],
     },
     {
       name: "Construção & Reformas",
       professions: [
         "Pedreiro",
+        "Servente de Pedreiro",
         "Eletricista",
+        "Eletricista Predial",
         "Encanador",
-        "Pintor",
+        "Instalador Hidráulico",
+        "Pintor Residencial",
+        "Pintor Industrial",
         "Arquiteto(a)",
         "Engenheiro Civil",
         "Mestre de Obras",
         "Gesseiro",
+        "Drywall",
         "Marceneiro",
+        "Carpinteiro",
         "Serralheiro",
+        "Vidraceiro",
+        "Instalador de Piso",
+        "Instalador de Porcelanato",
+        "Impermeabilizador"
       ],
     },
     {
       name: "Automotivo",
       professions: [
         "Mecânico de Automóveis",
+        "Mecânico de Motos",
         "Eletricista Automotivo",
-        "Lanterneiro / Funileiro",
+        "Funileiro / Lanterneiro",
         "Pintor Automotivo",
         "Borracheiro",
+        "Balanceamento e Alinhamento",
         "Lavador de Veículos",
-        "Instalador de Som/Acessórios",
+        "Polimento Automotivo",
+        "Estética Automotiva",
+        "Instalador de Som Automotivo",
+        "Instalador de Insulfilm",
+        "Instalador de Alarmes"
       ],
     },
     {
       name: "Beleza & Estética",
       professions: [
         "Cabeleireiro(a)",
+        "Colorista",
         "Barbeiro",
-        "Manicure / Pedicure",
+        "Manicure",
+        "Pedicure",
         "Esteticista",
         "Maquiador(a)",
         "Designer de Sobrancelhas",
+        "Lash Designer",
         "Depilador(a)",
+        "Micropigmentador(a)",
+        "Especialista em Harmonização Facial",
+        "Trancista",
+        "Tatuador(a)",
+        "Body Piercer"
       ],
     },
     {
       name: "Eventos & Gastronomia",
       professions: [
-        "Cozinheiro(a) / Chef",
+        "Chef de Cozinha",
+        "Cozinheiro(a)",
         "Confeiteiro(a)",
+        "Salgadeiro(a)",
+        "Churrasqueiro",
         "Garçom / Garçonete",
         "Bartender",
-        "Fotógrafo(a) de Eventos",
-        "Cerimonialista",
+        "Barista",
+        "Fotógrafo(a)",
+        "Videomaker",
         "DJ",
-        "Segurança de Eventos",
+        "Músico para Eventos",
+        "Cerimonialista",
+        "Decorador de Eventos",
+        "Organizador de Eventos",
+        "Segurança de Eventos"
       ],
     },
     {
       name: "Educação & Aulas",
       professions: [
-        "Professor(a) de Idiomas",
-        "Professor(a) de Música",
-        "Reforço Escolar",
+        "Professor Particular",
+        "Professor de Matemática",
+        "Professor de Português",
+        "Professor de Inglês",
+        "Professor de Espanhol",
+        "Professor de Música",
+        "Professor de Violão",
+        "Professor de Piano",
+        "Professor de Canto",
+        "Instrutor de Informática",
+        "Instrutor de Programação",
         "Instrutor de Direção",
+        "Preparador para Concursos",
+        "Tutor Online",
         "Palestrante",
-        "Coach",
+        "Coach"
       ],
     },
     {
       name: "Serviços Domésticos",
       professions: [
         "Diarista",
+        "Empregada Doméstica",
         "Cozinheira Doméstica",
         "Babá",
         "Cuidador(a) de Idosos",
+        "Cuidador(a) de Crianças",
         "Jardineiro",
+        "Paisagista",
         "Piscineiro",
         "Passadeira",
+        "Lavador de Roupas",
+        "Faxineiro(a)",
+        "Caseiro"
       ],
     },
     {
       name: "Jurídico & Administrativo",
       professions: [
         "Advogado(a)",
+        "Advogado Trabalhista",
+        "Advogado Civil",
+        "Advogado Criminal",
         "Contador(a)",
+        "Auditor(a)",
+        "Consultor Financeiro",
         "Assistente Administrativo",
         "Secretária Executiva",
+        "Analista Financeiro",
         "Corretor(a) de Imóveis",
         "Corretor(a) de Seguros",
+        "Despachante"
       ],
     },
     {
@@ -163,16 +240,47 @@ async function main() {
       professions: [
         "Gestor de Tráfego",
         "Social Media",
-        "Redator(a) / Copywriter",
+        "Analista de Marketing Digital",
+        "Especialista em SEO",
+        "Especialista em Google Ads",
+        "Copywriter",
+        "Redator(a)",
         "Designer Gráfico",
+        "Designer UI/UX",
+        "Web Designer",
         "Editor de Vídeo",
+        "Motion Designer",
         "Ilustrador(a)",
-        "Analista de Marketing",
+        "Fotógrafo(a)",
+        "Produtor de Conteúdo"
+      ],
+    },
+    {
+      name: "Logística & Transporte",
+      professions: [
+        "Motorista Particular",
+        "Motorista de Aplicativo",
+        "Motorista de Caminhão",
+        "Motoboy",
+        "Entregador",
+        "Freteiro",
+        "Mudanças Residenciais",
+        "Operador de Empilhadeira",
+        "Auxiliar de Logística"
       ],
     },
     {
       name: "Outros",
-      professions: ["Geral", "Outros"],
+      professions: [
+        "Tradutor",
+        "Intérprete",
+        "Artesão",
+        "Artista",
+        "Escritor",
+        "Consultor",
+        "Freelancer Geral",
+        "Outros"
+      ],
     },
   ];
 
@@ -416,11 +524,25 @@ async function main() {
 
   console.log("Iniciando seed de categorias de produtos...");
 
+  // Remover categorias que não estão no seed
+  const productCategoryNames = productCategories.map(c => c.name);
+  await (prisma as any).adCategory.deleteMany({
+    where: { name: { notIn: productCategoryNames } }
+  });
+
   for (const prodCat of productCategories) {
     const category = await (prisma as any).adCategory.upsert({
       where: { name: prodCat.name },
       update: {},
       create: { name: prodCat.name },
+    });
+
+    // Remover subcategorias órfãs desta categoria
+    await (prisma as any).adSubcategory.deleteMany({
+      where: {
+        categoryId: category.id,
+        name: { notIn: prodCat.subcategories }
+      }
     });
 
     for (const subName of prodCat.subcategories) {
@@ -437,11 +559,27 @@ async function main() {
 
   console.log("Iniciando seed de categorias e profissões...");
 
+  // Remover categorias de profissão que não estão no seed
+  const professionCategoryNames = categories.map(c => c.name);
+  await prisma.professionCategory.deleteMany({
+    where: { name: { notIn: professionCategoryNames } }
+  });
+
   for (const cat of categories) {
     const category = await prisma.professionCategory.upsert({
       where: { name: cat.name },
       update: {},
       create: { name: cat.name },
+    });
+
+    // Remover profissões órfãs desta categoria
+    // Nota: Como nome é @unique em Profession, podemos usar notIn direto se for global,
+    // mas aqui limpamos apenas dentro da categoria para ser mais preciso no mapeamento.
+    await prisma.profession.deleteMany({
+      where: {
+        categoryId: category.id,
+        name: { notIn: cat.professions }
+      }
     });
 
     for (const profName of cat.professions) {
