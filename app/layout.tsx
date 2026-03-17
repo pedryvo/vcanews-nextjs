@@ -15,10 +15,20 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "VCANews - Notícias de Vitória da Conquista",
   description: "As principais notícias de Vitória da Conquista e região em um só lugar.",
+  manifest: "/manifest.json",
+  themeColor: "#eab308",
+  viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "VCANews",
+  },
 };
 
 import Navbar from "@/components/Navbar";
+import MobileFooter from "@/components/MobileFooter";
 import { Providers } from "@/components/Providers";
+import { Toaster } from "sonner";
 
 export default function RootLayout({
   children,
@@ -33,7 +43,9 @@ export default function RootLayout({
       >
         <Providers>
           <Navbar />
-          <main>{children}</main>
+          <main className="pb-20 lg:pb-0">{children}</main>
+          <MobileFooter />
+          <Toaster position="top-center" />
         </Providers>
       </body>
     </html>
