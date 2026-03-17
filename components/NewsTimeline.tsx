@@ -81,6 +81,13 @@ export default function NewsTimeline({ initialPosts }: NewsTimelineProps) {
   };
 
   useEffect(() => {
+    const handleClearNews = () => {
+      setPosts([]);
+      setHasMore(false);
+    };
+
+    window.addEventListener("clear-news", handleClearNews);
+
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasMore) {
@@ -95,6 +102,7 @@ export default function NewsTimeline({ initialPosts }: NewsTimelineProps) {
     }
 
     return () => {
+      window.removeEventListener("clear-news", handleClearNews);
       if (observerTarget.current) {
         observer.unobserve(observerTarget.current);
       }

@@ -12,12 +12,17 @@ export default function MobileFooter() {
   const handleHomeClick = (e: React.MouseEvent) => {
     if (pathname === "/") {
       e.preventDefault();
+      
+      // 1. Limpar a lista (através de evento customizado para o componente NewsTimeline)
+      window.dispatchEvent(new CustomEvent("clear-news"));
+      
+      // 2. Ir para o topo
       window.scrollTo({ top: 0, behavior: "smooth" });
-      // Pequeno delay para o scroll suave começar antes do reload, 
-      // ou apenas dar o reload que já resolve o "novas notícias"
+      
+      // 3. Recarregar as notícias (reload da página)
       setTimeout(() => {
         window.location.reload();
-      }, 100);
+      }, 300); // 300ms para dar tempo do scroll suave começar e o usuário ver a lista sumindo
     }
   };
 
