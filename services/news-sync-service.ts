@@ -31,6 +31,10 @@ export class NewsSyncService {
   async sync() {
     console.log("============== [INICIO SYNC] ==============");
     try {
+      console.log("[SYNC] Limpando notícias duplicadas...");
+      const deleted = await blogPostRepository.deleteDuplicates();
+      if (deleted > 0) console.log(`[SYNC] OK: ${deleted} duplicatas removidas.`);
+
       console.log("[SYNC] Buscando blogs no banco de dados...");
       const blogs = await blogRepository.getAll();
       console.log(`[SYNC] OK: ${blogs.length} blogs encontrados.`);

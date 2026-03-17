@@ -70,6 +70,35 @@ export class BlogPostRepository {
       where: { id },
     });
   }
+
+  async deleteDuplicates() {
+    // This finding logic is useful if the @unique constraint wasn't always there 
+    // or if we want to be absolutely sure.
+    const duplicates = await prisma.$queryRaw<any[]>`
+      SELECT url FROM "BlogPost"
+      GROUP BY url
+      HAVING COUNT(*) > 1
+    `;
+
+    if (duplicates.length === 0) return 0;
+
+    let deletedCount = 0;
+    for (const dup of duplicates) {
+      const posts = await prisma.blogPost.findMany({
+        where: { url: dup.url },
+        orderBy: { createdAt: "asc" },
+      });
+
+      // Keep the first one, delete the rest
+      const [keep, ...remove] = posts;
+      for (const toRemove of remove) {
+        await prisma.blogPost.delete({ where: { id: toRemove.id } });
+        deletedCount++;
+      }
+    }
+
+    return deletedCount;
+  }
 }
 
 export const blogPostRepository = new BlogPostRepository();
