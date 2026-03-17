@@ -39,6 +39,17 @@ export async function GET() {
   }
 }
 
+import { z } from "zod";
+
+const profileUpdateSchema = z.object({
+  name: z.string().min(2).max(100).optional(),
+  bio: z.string().max(3000).optional(),
+  image: z.string().url().optional().or(z.literal("")),
+  coverImage: z.string().url().optional().or(z.literal("")),
+  professionId: z.string().uuid().nullable().optional(),
+  username: z.string().regex(/^[a-z0-9]+$/).min(3).max(30).optional(),
+});
+
 export async function PATCH(req: Request) {
   const session = await getServerSession(authOptions as any);
 
@@ -48,12 +59,17 @@ export async function PATCH(req: Request) {
 
   try {
     const body = await req.json();
-    const { name, bio, image, coverImage, professionId, username } = body;
-
-    // Validação de limite de bio
-    if (bio && bio.length > 3000) {
-      return NextResponse.json({ error: "Bio muito longa. Máximo 3000 caracteres." }, { status: 400 });
+    
+    // Zod Validation
+    const validation = profileUpdateSchema.safeParse(body);
+    if (!validation.success) {
+      return NextResponse.json({ 
+        error: "Dados inválidos", 
+        details: validation.error.format() 
+      }, { status: 400 });
     }
+
+    const { name, bio, image, coverImage, professionId, username } = validation.data;
 
     // Validação básica de username se fornecido
     if (username) {
@@ -74,12 +90,12 @@ export async function PATCH(req: Request) {
     const updatedUser = await (prisma as any).user.update({
       where: { email: (session as any).user.email },
       data: {
-        name: name || undefined,
+        name: name !== undefined ? name : undefined,
         bio: bio !== undefined ? bio : undefined,
-        image: image || undefined,
+        image: image !== undefined ? image : undefined,
         coverImage: coverImage !== undefined ? coverImage : undefined,
         professionId: professionId !== undefined ? professionId : undefined,
-        username: username ? username.toLowerCase().replace(/[^a-z0-9]/g, "") : undefined,
+        username: username || undefined,
       },
     });
 

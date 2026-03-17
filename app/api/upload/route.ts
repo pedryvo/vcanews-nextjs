@@ -15,10 +15,22 @@ export async function POST(req: Request) {
 
   const formData = await req.formData();
   const file = formData.get("file") as File | null;
-  const folder = formData.get("folder") as string || "uploads";
+  const folder = (formData.get("folder") as string || "uploads")
+    .replace(/\.\./g, "") // Prevent path traversal
+    .replace(/[^\w\-/]/g, ""); // Allow only safe characters
 
   if (!file) {
     return NextResponse.json({ error: "Nenhum arquivo enviado" }, { status: 400 });
+  }
+
+  // Security Validation: Size (5MB)
+  if (file.size > 5 * 1024 * 1024) {
+    return NextResponse.json({ error: "Arquivo muito grande (máximo 5MB)" }, { status: 400 });
+  }
+
+  // Security Validation: Types
+  if (!file.type.startsWith("image/")) {
+    return NextResponse.json({ error: "Apenas imagens são permitidas" }, { status: 400 });
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());

@@ -3,17 +3,11 @@ import { NextResponse } from "next/server";
 
 export default withAuth(
   function middleware(req) {
-    const isDev = process.env.NODE_ENV === "development";
-    if (isDev) {
-      return NextResponse.next();
-    }
     return NextResponse.next();
   },
   {
     callbacks: {
-      authorized: ({ token, req }) => {
-        const isDev = process.env.NODE_ENV === "development";
-        if (isDev) return true;
+      authorized: ({ token }) => {
         return token?.role === "ADMIN";
       },
     },

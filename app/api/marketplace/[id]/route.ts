@@ -144,10 +144,16 @@ export async function PATCH(
     const { id } = await params;
     const body = await req.json();
     const { status } = body;
+    const isModerationStatus = ["APPROVED", "REJECTED"].includes(status);
 
     // Only allow status updates
     if (!status || !["SOLD", "APPROVED", "PENDING", "REJECTED"].includes(status)) {
       return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+    }
+
+    // Check if user is trying to moderate without being an admin
+    if (isModerationStatus && (session.user as any).role !== "ADMIN") {
+      return NextResponse.json({ error: "Only admins can moderate ads" }, { status: 403 });
     }
 
     // Check ownership
