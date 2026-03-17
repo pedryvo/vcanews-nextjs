@@ -84,16 +84,19 @@ export function UserNav() {
             </div>
           </DropdownMenuLabel>
           
-          <DropdownMenuSeparator className="my-2" />
-          
-          <DropdownMenuItem asChild className="cursor-pointer rounded-xl py-3 focus:bg-primary/10 focus:text-primary group">
-            <Link href="/admin" className="flex w-full items-center gap-3 font-semibold">
-              <div className="p-2 rounded-lg bg-primary/5 group-focus:bg-primary/20 transition-colors">
-                <LayoutDashboard className="h-4 w-4" />
-              </div>
-              Painel Administrativo
-            </Link>
-          </DropdownMenuItem>
+          {session.user?.role === "ADMIN" && (
+            <>
+              <DropdownMenuSeparator className="my-2" />
+              <DropdownMenuItem asChild className="cursor-pointer rounded-xl py-3 focus:bg-primary/10 focus:text-primary group">
+                <Link href="/admin" className="flex w-full items-center gap-3 font-semibold">
+                  <div className="p-2 rounded-lg bg-primary/5 group-focus:bg-primary/20 transition-colors">
+                    <LayoutDashboard className="h-4 w-4" />
+                  </div>
+                  Painel Administrativo
+                </Link>
+              </DropdownMenuItem>
+            </>
+          )}
           
           <DropdownMenuSeparator className="my-2" />
           
