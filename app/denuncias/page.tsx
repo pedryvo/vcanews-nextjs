@@ -3,9 +3,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { DenunciaCard } from "@/components/DenunciaCard";
 import { DenunciaForm } from "@/components/DenunciaForm";
-import { useSession } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, LogIn } from "lucide-react";
 
 export default function DenunciasPage() {
   const { data: realSession } = useSession();
@@ -51,8 +52,15 @@ export default function DenunciasPage() {
       )}
 
       {!session?.user && (
-        <div className="mb-8 p-4 border border-yellow-200 bg-yellow-50 dark:bg-yellow-950/20 dark:border-yellow-900 rounded-lg text-sm text-center text-muted-foreground">
-          Faça login para enviar uma denúncia ou reagir às existentes.
+        <div className="mb-8 flex justify-center">
+          <Button 
+            onClick={() => signIn("google")}
+            size="lg"
+            className="w-full py-8 text-lg font-black tracking-widest bg-yellow-400 hover:bg-yellow-500 text-black border-b-8 border-yellow-600 active:border-b-0 active:translate-y-2 transition-all rounded-3xl gap-4 shadow-2xl"
+          >
+            <LogIn className="h-8 w-8" />
+            FAÇA LOGIN PARA ENVIAR UMA DENÚNCIA
+          </Button>
         </div>
       )}
 
