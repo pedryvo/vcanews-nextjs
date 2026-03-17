@@ -1,7 +1,10 @@
 import GoogleProvider from "next-auth/providers/google";
+import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/db";
 import { NextAuthOptions } from "next-auth";
+
+const isDev = process.env.NODE_ENV === "development";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma as any),
@@ -10,6 +13,30 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
+    ...(isDev
+      ? [
+          CredentialsProvider({
+            name: "Developer Login",
+            credentials: {
+              email: { label: "Email", type: "email", placeholder: "admin@example.com" },
+            },
+            async authorize(credentials) {
+              if (!credentials?.email) return null;
+
+              // Enforce that only users already in the DB can use this in dev
+              const user = await prisma.user.findUnique({
+                where: { email: credentials.email },
+              });
+
+              if (user) {
+                return user as any;
+              }
+
+              return null;
+            },
+          }),
+        ]
+      : []),
   ],
   session: {
     strategy: "jwt",

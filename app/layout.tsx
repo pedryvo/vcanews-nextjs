@@ -54,8 +54,9 @@ export const metadata: Metadata = {
   },
 };
 
-import Navbar from "@/components/Navbar";
-import MobileFooter from "@/components/MobileFooter";
+import { Navbar } from "@/components/navigation/Navbar";
+import { MobileHeader } from "@/components/navigation/MobileHeader";
+import { BottomNavigation } from "@/components/navigation/BottomNavigation";
 import { Providers } from "@/components/Providers";
 import { AgeGuard } from "@/components/AgeGuard";
 import { Toaster } from "sonner";
@@ -73,10 +74,13 @@ export default function RootLayout({
       >
         <Providers>
           <AgeGuard>
-            <Navbar />
-            <main className="pb-20 lg:pb-0">{children}</main>
-            <MobileFooter />
-            <Toaster position="top-center" />
+            <div className="flex flex-col min-h-screen">
+              <Navbar />
+              <MobileHeader />
+              <main className="flex-1 pb-20 md:pb-0">{children}</main>
+              <BottomNavigation />
+              <Toaster position="top-center" />
+            </div>
           </AgeGuard>
         </Providers>
       </body>
