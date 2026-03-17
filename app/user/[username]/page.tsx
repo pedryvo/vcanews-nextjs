@@ -38,6 +38,8 @@ export default function PublicProfilePage({ params }: PublicProfileProps) {
   const [loading, setLoading] = useState(true);
   const [startingBudget, setStartingBudget] = useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
   useEffect(() => {
     async function fetchPublicProfile() {
@@ -103,6 +105,30 @@ export default function PublicProfilePage({ params }: PublicProfileProps) {
       }
     } catch (error) {
       toast.error("Erro na conexão");
+    }
+  };
+
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      setActiveSlide(prev => (prev === user.portfolio.length - 1 ? 0 : prev + 1));
+    } else if (isRightSwipe) {
+      setActiveSlide(prev => (prev === 0 ? user.portfolio.length - 1 : prev - 1));
     }
   };
 
@@ -290,11 +316,17 @@ export default function PublicProfilePage({ params }: PublicProfileProps) {
               <CardContent className="p-6">
                 {user.portfolio && user.portfolio.length > 0 ? (
                   <div className="space-y-4">
-                    <div className="relative aspect-[4/3] rounded-3xl overflow-hidden bg-muted group/item">
+                    <div 
+                      className="relative aspect-[4/3] rounded-3xl overflow-hidden bg-muted group/item"
+                      onTouchStart={onTouchStart}
+                      onTouchMove={onTouchMove}
+                      onTouchEnd={onTouchEnd}
+                    >
                       <img 
                         src={user.portfolio[activeSlide].url} 
                         className="w-full h-full object-cover transition-all duration-500" 
                         alt="Portfolio" 
+                        draggable={false}
                       />
                       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 px-3 py-1.5 bg-black/40 backdrop-blur-md rounded-full border border-white/10">
                         {user.portfolio.map((_: any, idx: number) => (
