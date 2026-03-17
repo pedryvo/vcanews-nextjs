@@ -7,16 +7,16 @@ import { blogRepository } from "@/repositories/blog-repository";
 import { blogPostRepository } from "@/repositories/blog-post-repository";
 
 export default async function AdminDashboard() {
-  const [cidades, blogs, posts] = await Promise.all([
+  const [cidades, blogs, totalPosts] = await Promise.all([
     cidadeRepository.getAll(),
     blogRepository.getAll(),
-    blogPostRepository.getLatest(5),
+    blogPostRepository.count(),
   ]);
 
   const stats = [
     { name: "Cidades", value: cidades.length, icon: Building2 },
     { name: "Blogs", value: blogs.length, icon: Rss },
-    { name: "Notícias", value: posts.length, icon: Newspaper }, // Isso é apenas o 'top', mas serve pra dashboard
+    { name: "Notícias", value: totalPosts, icon: Newspaper },
   ];
 
   return (

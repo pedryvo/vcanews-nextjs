@@ -2,6 +2,10 @@ import { prisma } from "@/lib/db";
 import { Prisma } from "@prisma/client";
 
 export class BlogPostRepository {
+  async count() {
+    return prisma.blogPost.count();
+  }
+
   async getLatest(take: number = 12) {
     return prisma.blogPost.findMany({
       orderBy: { dataPublicacao: "desc" },

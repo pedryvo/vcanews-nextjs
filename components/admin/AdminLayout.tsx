@@ -7,6 +7,8 @@ import {
   ChevronRight
 } from "lucide-react";
 
+import { SyncButton } from "./SyncButton";
+
 export default function AdminLayout({
   children,
 }: {
@@ -22,7 +24,7 @@ export default function AdminLayout({
   return (
     <div className="flex min-h-[calc(100vh-4rem)] bg-muted/30">
       {/* Sidebar */}
-      <aside className="w-64 border-r bg-background hidden md:block">
+      <aside className="w-64 border-r bg-background hidden md:flex flex-col">
         <div className="p-6">
           <h2 className="text-lg font-semibold tracking-tight">Backoffice</h2>
         </div>
@@ -39,6 +41,10 @@ export default function AdminLayout({
             </Link>
           ))}
         </nav>
+
+        <div className="mt-auto p-4 border-t">
+          <SyncButton />
+        </div>
       </aside>
 
       {/* Main Content */}
