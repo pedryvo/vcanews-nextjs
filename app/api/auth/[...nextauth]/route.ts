@@ -15,9 +15,21 @@ export const authOptions = {
     strategy: "jwt" as const,
   },
   callbacks: {
+    async jwt({ token, user }: any) {
+      if (user) {
+        token.role = (user as any).role || "USER";
+      }
+
+      if (token.email === process.env.ADMIN_USER) {
+        token.role = "ADMIN";
+      }
+
+      return token;
+    },
     async session({ session, token }: any) {
       if (token && session.user) {
         session.user.id = token.sub;
+        session.user.role = token.role;
       }
       return session;
     },
