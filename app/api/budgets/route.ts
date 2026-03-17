@@ -6,12 +6,12 @@ import { prisma } from "@/lib/db";
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions as any);
-    if (!session?.user) {
+    if (!(session as any)?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { receiverId } = await req.json();
-    const senderId = (session.user as any).id;
+    const senderId = (session as any).user.id;
 
     if (senderId === receiverId) {
       return NextResponse.json({ error: "Você não pode pedir um orçamento para si mesmo" }, { status: 400 });
@@ -78,11 +78,11 @@ export async function POST(req: Request) {
 export async function GET() {
   try {
     const session = await getServerSession(authOptions as any);
-    if (!session?.user) {
+    if (!(session as any)?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userId = (session.user as any).id;
+    const userId = (session as any).user.id;
 
     const conversations = await prisma.budgetConversation.findMany({
       where: {

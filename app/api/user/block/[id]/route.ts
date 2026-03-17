@@ -7,9 +7,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   try {
     const { id } = await params;
     const session = await getServerSession(authOptions as any);
-    if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!(session as any)?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const userId = (session.user as any).id;
+    const userId = (session as any).user.id;
 
     const existingBlock = await prisma.userBlock.findUnique({
       where: {

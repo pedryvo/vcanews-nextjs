@@ -79,12 +79,12 @@ export const authOptions = {
       return token;
     },
     async session({ session, token }: any) {
-      if (token && session.user) {
-        session.user.id = token.id;
-        session.user.role = token.role;
-        session.user.username = token.username;
-        session.user.birthDate = token.birthDate;
-        session.user.isBlocked = token.isBlocked;
+      if (token && (session as any).user) {
+        (session as any).user.id = token.id;
+        (session as any).user.role = token.role;
+        (session as any).user.username = token.username;
+        (session as any).user.birthDate = token.birthDate;
+        (session as any).user.isBlocked = token.isBlocked;
       }
       return session;
     },

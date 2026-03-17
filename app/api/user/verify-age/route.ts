@@ -6,7 +6,7 @@ import { prisma } from "@/lib/db";
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions as any);
-    if (!session?.user) {
+    if (!(session as any)?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -31,7 +31,7 @@ export async function POST(req: Request) {
     }
 
     await prisma.user.update({
-      where: { id: (session.user as any).id },
+      where: { id: (session as any).user.id },
       data: { birthDate: birthDateObj },
     });
 

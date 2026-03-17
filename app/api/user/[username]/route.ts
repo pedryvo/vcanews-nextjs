@@ -42,7 +42,7 @@ export async function GET(
       const block = await prisma.userBlock.findUnique({
         where: {
           blockerId_blockedId: {
-            blockerId: (session.user as any).id,
+            blockerId: (session as any).user.id,
             blockedId: user.id,
           },
         },

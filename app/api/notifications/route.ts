@@ -6,9 +6,9 @@ import { prisma } from "@/lib/db";
 export async function GET() {
   try {
     const session = await getServerSession(authOptions as any);
-    if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!(session as any)?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const userId = (session.user as any).id;
+    const userId = (session as any).user.id;
 
     const notifications = await prisma.notification.findMany({
       where: { userId },
@@ -84,9 +84,9 @@ export async function GET() {
 export async function PATCH(req: Request) {
   try {
     const session = await getServerSession(authOptions as any);
-    if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!(session as any)?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const userId = (session.user as any).id;
+    const userId = (session as any).user.id;
 
     await prisma.notification.updateMany({
       where: { userId, read: false },

@@ -6,14 +6,14 @@ import { prisma } from "@/lib/db";
 export async function GET() {
   const session = await getServerSession(authOptions as any);
 
-  if (!session?.user?.email) {
+  if (!(session as any)?.user?.email) {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   }
 
   try {
     const images = await prisma.portfolioImage.findMany({
       where: {
-        user: { email: session.user.email }
+        user: { email: (session as any).user.email }
       },
       orderBy: { order: "asc" }
     });
@@ -27,7 +27,7 @@ export async function GET() {
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions as any);
 
-  if (!session?.user?.email) {
+  if (!(session as any)?.user?.email) {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   }
 
@@ -43,7 +43,7 @@ export async function POST(req: Request) {
     }
 
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email }
+      where: { email: (session as any).user.email }
     });
 
     if (!user) {

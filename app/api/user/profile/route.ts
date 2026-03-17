@@ -6,13 +6,13 @@ import { prisma } from "@/lib/db";
 export async function GET() {
   const session = await getServerSession(authOptions as any);
 
-  if (!session?.user?.email) {
+  if (!(session as any)?.user?.email) {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   }
 
   try {
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: (session as any).user.email },
       include: {
         profession: {
           include: {
@@ -37,7 +37,7 @@ export async function GET() {
 export async function PATCH(req: Request) {
   const session = await getServerSession(authOptions as any);
 
-  if (!session?.user?.email) {
+  if (!(session as any)?.user?.email) {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   }
 
@@ -57,7 +57,7 @@ export async function PATCH(req: Request) {
       const existing = await prisma.user.findFirst({
         where: {
           username: cleanUsername,
-          NOT: { email: session.user.email },
+          NOT: { email: (session as any).user.email },
         },
       });
 
@@ -67,7 +67,7 @@ export async function PATCH(req: Request) {
     }
 
     const updatedUser = await prisma.user.update({
-      where: { email: session.user.email },
+      where: { email: (session as any).user.email },
       data: {
         name: name || undefined,
         bio: bio !== undefined ? bio : undefined,

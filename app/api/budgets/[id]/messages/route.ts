@@ -7,10 +7,10 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   try {
     const { id } = await params;
     const session = await getServerSession(authOptions as any);
-    if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!(session as any)?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { content } = await req.json();
-    const userId = (session.user as any).id;
+    const userId = (session as any).user.id;
 
     // Verificar se a conversa existe e se o usuário faz parte dela
     const conversation = await prisma.budgetConversation.findUnique({
@@ -78,9 +78,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   try {
     const { id } = await params;
     const session = await getServerSession(authOptions as any);
-    if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!(session as any)?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const userId = (session.user as any).id;
+    const userId = (session as any).user.id;
 
     const conversation = await prisma.budgetConversation.findUnique({
       where: { id },
@@ -106,9 +106,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   try {
     const { id } = await params;
     const session = await getServerSession(authOptions as any);
-    if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!(session as any)?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const userId = (session.user as any).id;
+    const userId = (session as any).user.id;
     const { status } = await req.json();
 
     const conversation = await prisma.budgetConversation.findUnique({
