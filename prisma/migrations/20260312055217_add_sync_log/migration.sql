@@ -1,0 +1,8 @@
+-- CreateTable
+CREATE TABLE "SyncLog" (
+    "id" INTEGER NOT NULL DEFAULT 1,
+    "lastSync" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "status" TEXT NOT NULL DEFAULT 'SUCCESS',
+
+    CONSTRAINT "SyncLog_pkey" PRIMARY KEY ("id")
+);

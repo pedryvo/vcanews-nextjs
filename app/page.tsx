@@ -1,8 +1,12 @@
 import { blogPostRepository } from "@/repositories/blog-post-repository";
 export const dynamic = "force-dynamic";
 import NewsTimeline from "@/components/NewsTimeline";
+import { newsSyncService } from "@/services/news-sync-service";
 
 export default async function Home() {
+  // Sincronização passiva: verifica e sincroniza se necessário (sem travar o render)
+  newsSyncService.checkAndSync().catch(console.error);
+
   const initialNews = await blogPostRepository.getLatest(12);
 
   return (

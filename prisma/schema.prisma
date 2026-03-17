@@ -80,3 +80,9 @@ model VerificationToken {
 
   @@unique([identifier, token])
 }
+
+model SyncLog {
+  id        Int      @id @default(1)
+  lastSync  DateTime @default(now())
+  status    String   @default("SUCCESS")
+}
