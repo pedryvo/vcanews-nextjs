@@ -12,13 +12,21 @@ const isProd = process.env.NODE_ENV === "production";
 const connectionString = process.env.DATABASE_URL || process.env.NEON_DATABASE_URL;
 
 if (!connectionString) {
-  console.error("CRITICAL: DATABASE_URL or NEON_DATABASE_URL is not defined!");
+  console.warn("[DB] WARNING: DATABASE_URL and NEON_DATABASE_URL are both missing or empty.");
+} else {
+  const maskedUrl = connectionString.replace(/:[^:@]+@/, ':***@');
+  console.log(`[DB] Connection string found: ${maskedUrl.split('@')[1] || 'format unknown'}`);
 }
 
 const createPrismaClient = () => {
   let adapter;
   
   if (isProd) {
+    if (!connectionString) {
+      // Falhar explicitamente no pool se não houver URL em prod
+      // Isso ajuda a debugar no Vercel
+      throw new Error("DATABASE_URL must be defined for production!");
+    }
     const pool = new NeonPool({ 
       connectionString,
       connectionTimeoutMillis: 10000,
