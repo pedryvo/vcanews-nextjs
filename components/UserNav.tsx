@@ -29,13 +29,13 @@ export function UserNav() {
   if (status === "unauthenticated" || !session) {
     return (
       <Button 
-        variant="outline" 
+        variant="default" 
         size="sm" 
         onClick={() => signIn("google")}
-        className="rounded-full gap-2 border-primary/20 hover:bg-primary/10 hover:text-primary transition-all font-bold"
+        className="rounded-full gap-2 font-black tracking-widest bg-yellow-400 hover:bg-yellow-500 text-black border-b-4 border-yellow-600 active:border-b-0 active:translate-y-1 transition-all shadow-lg"
       >
         <LogIn className="h-4 w-4" />
-        Entrar
+        LOGIN
       </Button>
     );
   }
