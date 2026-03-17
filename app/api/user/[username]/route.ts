@@ -38,7 +38,7 @@ export async function GET(
 
     const session = await getServerSession(authOptions as any);
     let isBlockedByMe = false;
-    if (session?.user) {
+    if ((session as any)?.user) {
       const block = await prisma.userBlock.findUnique({
         where: {
           blockerId_blockedId: {
