@@ -1,10 +1,24 @@
 "use client";
 
+import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Loader2 } from "lucide-react";
 
 export default function SignInPage() {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSignIn = async () => {
+    setIsLoading(true);
+    try {
+      await signIn("google", { callbackUrl: "/" });
+    } catch (error) {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4 bg-muted/30">
       <Card className="w-full max-w-md border-2 shadow-xl rounded-3xl overflow-hidden">
@@ -16,9 +30,9 @@ export default function SignInPage() {
         </CardHeader>
         <CardContent className="grid gap-6 p-8">
           <Button 
-            variant="outline" 
             className="w-full h-12 text-lg font-bold rounded-full gap-3 border-2 hover:bg-primary/10 hover:text-primary transition-all shadow-sm"
-            onClick={() => signIn("google", { callbackUrl: "/" })}
+            onClick={handleSignIn}
+            disabled={isLoading}
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24">
               <path
@@ -42,6 +56,21 @@ export default function SignInPage() {
           </Button>
         </CardContent>
       </Card>
+
+      <Dialog open={isLoading} onOpenChange={() => {}}>
+        <DialogContent className="sm:max-w-[400px] border-none bg-white/80 backdrop-blur-xl rounded-[2.5rem] shadow-2xl flex flex-col items-center justify-center py-12 outline-none">
+          <div className="relative mb-6">
+            <div className="absolute inset-0 bg-blue-500/20 blur-3xl rounded-full animate-pulse" />
+            <Loader2 className="h-16 w-16 text-blue-600 animate-spin relative z-10" />
+          </div>
+          <DialogTitle className="text-2xl font-black text-slate-800 uppercase tracking-tighter text-center">
+            Conectando...
+          </DialogTitle>
+          <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-2">
+            Preparando seu acesso ao VCA News
+          </p>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
