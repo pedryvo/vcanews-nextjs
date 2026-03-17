@@ -18,6 +18,8 @@ if (!connectionString) {
 
 const pool = new Pool({ 
   connectionString,
+  max: 1, // Recomendado para Serverless
+  connectionTimeoutMillis: 5000,
   ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false
 });
 

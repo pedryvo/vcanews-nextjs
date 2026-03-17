@@ -3,7 +3,10 @@ import { blogRepository } from "@/repositories/blog-repository";
 import { blogPostRepository } from "@/repositories/blog-post-repository";
 import { extract } from "@extractus/article-extractor";
 
+console.log("[SYNC] NewsSyncService module loading...");
+
 const parser = new Parser({
+  timeout: 10000,
   customFields: {
     item: [
       ["media:content", "mediaContent", { keepArray: true }],
@@ -14,10 +17,11 @@ const parser = new Parser({
 
 export class NewsSyncService {
   async sync() {
-    console.info("============== [START SYNC] ==============");
+    console.log("============== [INICIO SYNC] ==============");
     try {
+      console.log("[SYNC] Buscando blogs no banco de dados...");
       const blogs = await blogRepository.getAll();
-      console.info(`[SYNC] Blogs para processar: ${blogs.length}`);
+      console.log(`[SYNC] OK: ${blogs.length} blogs encontrados.`);
 
       for (const blog of blogs) {
         console.info(`[SYNC] > Blog: ${blog.nome} (ID: ${blog.id})`);
@@ -30,18 +34,14 @@ export class NewsSyncService {
           for (const item of items) {
             if (!item.link || !item.title) continue;
 
-            // Log de início de processamento do item
-            // console.info(`[SYNC]   - Verificando: ${item.title.substring(0, 30)}...`);
-            
             try {
               const startExists = Date.now();
               const exists = await blogPostRepository.existsByUrl(item.link);
-              // console.info(`[SYNC]     - Exists check: ${Date.now() - startExists}ms`);
               
               if (exists) continue;
 
               countNew++;
-              console.info(`[SYNC]   + NOVO: ${item.title.substring(0, 40)}...`);
+              console.log(`[SYNC]   + NOVO: ${item.title.substring(0, 40)}...`);
 
               let imageUrl = this.extractImageUrlFromRSS(item);
               let titulo = item.title;
@@ -50,8 +50,6 @@ export class NewsSyncService {
 
               if (needsExtraction) {
                 try {
-                  // Adicionando um timeout manual para a extração ou apenas logando
-                  // console.info(`[SYNC]     - Extraindo metadados extras...`);
                   const article = await extract(item.link);
                   if (article) {
                     if (!imageUrl && article.image) imageUrl = article.image;
@@ -66,7 +64,6 @@ export class NewsSyncService {
 
               const publishDate = item.pubDate ? new Date(item.pubDate) : new Date();
 
-              const startUpsert = Date.now();
               await blogPostRepository.upsert({
                 where: { url: item.link },
                 update: { titulo, imageUrl, dataPublicacao: publishDate },
@@ -78,12 +75,11 @@ export class NewsSyncService {
                   blogId: blog.id,
                 },
               });
-              // console.info(`[SYNC]     - Upsert OK: ${Date.now() - startUpsert}ms`);
             } catch (itemError) {
               console.error(`[SYNC]     !!! ERRO NO ITEM ${item.link}:`, itemError);
             }
           }
-          console.info(`[SYNC] > Sucesso: ${blog.nome} (+${countNew} novos)`);
+          console.log(`[SYNC] > Sucesso: ${blog.nome} (+${countNew} novos)`);
         } catch (blogError) {
           console.error(`[SYNC] !!! ERRO NO BLOG ${blog.nome}:`, blogError);
         }
@@ -91,7 +87,7 @@ export class NewsSyncService {
     } catch (globalError) {
       console.error("[SYNC] !!! ERRO GLOBAL NO SYNC:", globalError);
     }
-    console.info("============== [END SYNC] ==============");
+    console.log("============== [FIM SYNC] ==============");
   }
 
   private extractImageUrlFromRSS(item: any): string | null {

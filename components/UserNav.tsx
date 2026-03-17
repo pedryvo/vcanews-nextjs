@@ -15,7 +15,11 @@ import { LogOut, LayoutDashboard, LogIn } from "lucide-react";
 import Link from "next/link";
 
 export function UserNav() {
-  const { data: session, status } = useSession();
+  const { data: realSession, status: realStatus } = useSession();
+  
+  const isDev = process.env.NODE_ENV === "development";
+  const session = isDev ? (realSession || { user: { name: "Dev Admin", email: "dev@local", role: "ADMIN", image: "" } }) : realSession;
+  const status = isDev ? "authenticated" : realStatus;
 
   if (status === "loading") {
     return <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />;

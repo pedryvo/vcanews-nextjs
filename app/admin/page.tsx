@@ -7,6 +7,9 @@ import { blogRepository } from "@/repositories/blog-repository";
 import { blogPostRepository } from "@/repositories/blog-post-repository";
 
 export default async function AdminDashboard() {
+  console.log("[DEBUG] AdminDashboard: Iniciando renderização...");
+  const isDev = process.env.NODE_ENV === "development";
+
   const [cidades, blogs, totalPosts] = await Promise.all([
     cidadeRepository.getAll(),
     blogRepository.getAll(),
