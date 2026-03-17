@@ -13,6 +13,7 @@ const isVercel = !!process.env.VERCEL;
 const isProd = process.env.NODE_ENV === "production" || isVercel;
 
 // Prioridade para DATABASE_URL em produção, NEON_DATABASE_URL como fallback
+// Nota: DIRECT_URL é reservado para migrações em prisma.config.ts
 const connectionString = process.env.DATABASE_URL || process.env.NEON_DATABASE_URL;
 
 const createPrismaClient = () => {
