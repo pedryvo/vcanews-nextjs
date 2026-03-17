@@ -110,7 +110,7 @@ function MarketplaceContent() {
             O ponto de encontro para quem quer desapegar ou encontrar as melhores oportunidades em Vitória da Conquista.
           </p>
 
-          {session && (
+          {session ? (
             <div className="pt-4">
               <Dialog open={adFormOpen} onOpenChange={setAdFormOpen}>
                 <DialogTrigger asChild>
@@ -132,6 +132,12 @@ function MarketplaceContent() {
                   />
                 </DialogContent>
               </Dialog>
+            </div>
+          ) : (
+            <div className="pt-4">
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted/50 py-3 px-6 rounded-full inline-block border-2 border-dashed">
+                Faça login para criar seu anúncio
+              </p>
             </div>
           )}
         </div>
