@@ -1,5 +1,4 @@
 import Parser from "rss-parser";
-import { prisma } from "@/lib/db";
 import { blogRepository } from "@/repositories/blog-repository";
 import { blogPostRepository } from "@/repositories/blog-post-repository";
 import { extract } from "@extractus/article-extractor";
@@ -14,51 +13,6 @@ const parser = new Parser({
 });
 
 export class NewsSyncService {
-  async checkAndSync() {
-    try {
-      // Busca o último log de sincronização (id=1 sempre)
-      const lastSyncLog = await prisma.syncLog.findUnique({
-        where: { id: 1 }
-      });
-
-      const now = new Date();
-      const twoMinutesInMs = 2 * 60 * 1000;
-
-      if (lastSyncLog) {
-        const timeSinceLastSync = now.getTime() - lastSyncLog.lastSync.getTime();
-        if (timeSinceLastSync < twoMinutesInMs) {
-          // console.log("Sync ignorado: executado há menos de 2 minutos.");
-          return;
-        }
-      }
-
-      console.log("--- Iniciando Sincronização Passiva (Intervalor: 2min) ---");
-
-      // Atualiza o timestamp ANTES de começar para evitar disparos paralelos excessivos
-      // (Atomicidade simples via DB)
-      await prisma.syncLog.upsert({
-        where: { id: 1 },
-        update: { lastSync: now, status: "RUNNING" },
-        create: { id: 1, lastSync: now, status: "RUNNING" }
-      });
-
-      await this.sync();
-
-      await prisma.syncLog.update({
-        where: { id: 1 },
-        data: { status: "SUCCESS", lastSync: new Date() }
-      });
-
-    } catch (error) {
-      console.error("Erro no checkAndSync:", error);
-      await prisma.syncLog.upsert({
-        where: { id: 1 },
-        update: { status: "FAILED" },
-        create: { id: 1, status: "FAILED" }
-      });
-    }
-  }
-
   async sync() {
     const blogs = await blogRepository.getAll();
 

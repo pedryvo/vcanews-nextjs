@@ -1,13 +1,11 @@
 import { NextResponse } from "next/server";
 import { newsSyncService } from "@/services/news-sync-service";
 
-export async function GET(request: Request) {
-  const authHeader = request.headers.get('authorization');
-  if (process.env.NODE_ENV === 'production' && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response('Unauthorized', { status: 401 });
-  }
+import { verifySignatureAppRouter } from "@upstash/qstash/nextjs";
 
+async function handler() {
   try {
+    console.log("--- Iniciando Sincronização via QStash ---");
     await newsSyncService.sync();
     return NextResponse.json({ message: "Sincronização concluída com sucesso!" });
   } catch (error) {
@@ -18,3 +16,6 @@ export async function GET(request: Request) {
     );
   }
 }
+
+export const POST = verifySignatureAppRouter(handler);
+export const dynamic = "force-dynamic";
