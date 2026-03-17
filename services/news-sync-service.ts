@@ -74,9 +74,7 @@ export class NewsSyncService {
 
               if (needsExtraction) {
                 try {
-                  const article = await extract(item.link, {
-                    headers: COMMON_HEADERS
-                  });
+                  const article = await extract(item.link);
                   if (article) {
                     if (!imageUrl && article.image) imageUrl = article.image;
                     if (article.title && article.title.length > titulo.length) {
