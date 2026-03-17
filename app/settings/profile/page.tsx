@@ -430,14 +430,26 @@ export default function ProfileSettingsPage() {
                           size="icon" 
                           className="h-8 w-8 rounded-full"
                           onClick={async () => {
-                            const newImages = portfolioImages.filter((_, i) => i !== idx);
-                            setPortfolioImages(newImages);
-                            await fetch("/api/user/portfolio", {
-                              method: "POST",
-                              headers: { "Content-Type": "application/json" },
-                              body: JSON.stringify({ images: newImages }),
-                            });
-                            toast.success("Removido com sucesso");
+                            if (saving) return;
+                            setSaving(true);
+                            try {
+                              const newImages = portfolioImages.filter((_, i) => i !== idx);
+                              setPortfolioImages(newImages);
+                              const res = await fetch("/api/user/portfolio", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ images: newImages }),
+                              });
+                              if (res.ok) {
+                                toast.success("Removido com sucesso");
+                              } else {
+                                throw new Error("Erro ao remover");
+                              }
+                            } catch (error) {
+                              toast.error("Erro ao sincronizar galeria");
+                            } finally {
+                              setSaving(false);
+                            }
                           }}
                         >
                           <Trash2 className="h-4 w-4" />

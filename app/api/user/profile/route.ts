@@ -19,6 +19,11 @@ export async function GET() {
             category: true,
           },
         },
+        portfolio: {
+          orderBy: {
+            order: "asc",
+          },
+        },
       },
     });
 
