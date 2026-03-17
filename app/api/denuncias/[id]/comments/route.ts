@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { commentRepository } from "@/repositories/comment-repository";
 import { prisma } from "@/lib/db";
+import { pusherServer } from "@/lib/pusher";
 
 export async function GET(
   req: Request,
@@ -55,15 +56,12 @@ export async function POST(
         }
       });
 
-      // Notificar via Socket
-      const io = (global as any).io;
-      if (io) {
-        io.to(`user-${denuncia.userId}`).emit("notification", {
-          type: "COMMENT",
-          referenceId: id,
-          message: "Sua denúncia recebeu um novo comentário!"
-        });
-      }
+      // Notificar via Pusher
+      await pusherServer.trigger(`user-${denuncia.userId}`, "notification", {
+        type: "COMMENT",
+        referenceId: id,
+        message: "Sua denúncia recebeu um novo comentário!"
+      });
     }
 
     return NextResponse.json(comment);

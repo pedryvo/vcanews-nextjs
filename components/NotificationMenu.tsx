@@ -51,8 +51,14 @@ export function NotificationMenu() {
       const channelName = `user-${(session as any).user.id}`;
       const channel = socket.subscribe(channelName);
       
-      channel.bind("notification", () => {
+      channel.bind("notification", (data: any) => {
         fetchNotifications();
+        
+        // Mostrar toast se não estivermos no chat específico da notificação
+        const isChatPage = data.referenceId && pathname?.includes(`/mensagens/${data.referenceId}`);
+        if (!isChatPage && data.message) {
+          toast.success(data.message);
+        }
       });
 
       return () => {

@@ -27,7 +27,7 @@ export default function BlockedPage() {
           <Button 
             variant="destructive" 
             className="w-full h-12 rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-destructive/20"
-            onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+            onClick={() => signOut({ callbackUrl: "/" })}
           >
             <LogOut className="mr-2 h-4 w-4" /> Sair da Conta
           </Button>

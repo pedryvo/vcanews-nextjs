@@ -138,7 +138,7 @@ export function UserNav() {
           
           <DropdownMenuItem 
             className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive font-bold rounded-xl py-3 flex items-center gap-3 group" 
-            onClick={() => signOut()}
+            onClick={() => signOut({ callbackUrl: "/" })}
           >
             <div className="p-2 rounded-lg bg-destructive/5 group-focus:bg-destructive/10 transition-colors">
               <LogOut className="h-4 w-4" />

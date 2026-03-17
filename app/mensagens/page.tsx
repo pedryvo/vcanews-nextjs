@@ -16,6 +16,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useSocket } from "@/hooks/use-socket";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -25,23 +26,41 @@ export default function MensagensPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
+  const socket = useSocket();
+
+  const fetchConversations = async () => {
+    try {
+      const res = await fetch("/api/budgets");
+      if (res.ok) {
+        const data = await res.json();
+        setConversations(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch conversations");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (status === "unauthenticated") return;
-    async function fetchConversations() {
-      try {
-        const res = await fetch("/api/budgets");
-        if (res.ok) {
-          const data = await res.json();
-          setConversations(data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch conversations");
-      } finally {
-        setLoading(false);
-      }
-    }
     fetchConversations();
   }, [status]);
+
+  useEffect(() => {
+    if (socket && session) {
+      const channelName = `user-${(session as any).user.id}`;
+      const channel = socket.subscribe(channelName);
+      
+      channel.bind("notification", () => {
+        fetchConversations();
+      });
+
+      return () => {
+        channel.unbind("notification");
+      };
+    }
+  }, [socket, session]);
 
   if (status === "loading" || loading) {
     return (

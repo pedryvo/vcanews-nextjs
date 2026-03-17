@@ -45,6 +45,7 @@ export default function ChatRoomPage({ params }: { params: Promise<{ id: string 
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeMembers, setActiveMembers] = useState<Set<string>>(new Set());
   const socket = useSocket();
 
   useEffect(() => {
@@ -86,10 +87,34 @@ export default function ChatRoomPage({ params }: { params: Promise<{ id: string 
         }
       });
 
+      const presenceChannel = socket.subscribe(`presence-chat-${id}`);
+
+      presenceChannel.bind("pusher:subscription_succeeded", (members: any) => {
+        const memberIds = new Set<string>();
+        members.each((member: any) => memberIds.add(member.id));
+        setActiveMembers(memberIds);
+      });
+
+      presenceChannel.bind("pusher:member_added", (member: any) => {
+        setActiveMembers((prev) => new Set(prev).add(member.id));
+      });
+
+      presenceChannel.bind("pusher:member_removed", (member: any) => {
+        setActiveMembers((prev) => {
+          const next = new Set(prev);
+          next.delete(member.id);
+          return next;
+        });
+      });
+
       return () => {
         channel.unbind("new-message");
         channel.unbind("conversation-status-updated");
+        presenceChannel.unbind("pusher:subscription_succeeded");
+        presenceChannel.unbind("pusher:member_added");
+        presenceChannel.unbind("pusher:member_removed");
         socket.unsubscribe(id);
+        socket.unsubscribe(`presence-chat-${id}`);
       };
     }
   }, [socket, id, session]);
@@ -169,8 +194,17 @@ export default function ChatRoomPage({ params }: { params: Promise<{ id: string 
             </Avatar>
             <div>
               <h2 className="text-sm font-bold uppercase tracking-tight">{otherUser.name}</h2>
-              <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">
-                {isFinished ? "Conversa Encerrada" : "Online agora"}
+              <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest flex items-center gap-1.5">
+                {isFinished ? (
+                  "Conversa Encerrada"
+                ) : activeMembers.has(otherUser?.id) ? (
+                  <>
+                    <span className="flex h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
+                    <span className="text-green-600">Online agora</span>
+                  </>
+                ) : (
+                  "Offline"
+                )}
               </p>
             </div>
           </div>
