@@ -7,6 +7,7 @@ import { Menu, X, Mail } from "lucide-react"
 import { UserNav } from "@/components/UserNav"
 import { NotificationMenu } from "@/components/NotificationMenu"
 import { WeatherWidget } from "@/components/WeatherWidget"
+import { ModeToggle } from "@/components/ModeToggle"
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -72,8 +73,9 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-2">
             <WeatherWidget />
+            <ModeToggle />
             <NotificationMenu />
             <UserNav />
           </div>
@@ -103,6 +105,7 @@ export default function Navbar() {
               </Link>
             ))}
             <div className="flex items-center justify-around py-2 border-t mt-2">
+              <ModeToggle />
               <NotificationMenu />
               <UserNav />
             </div>
