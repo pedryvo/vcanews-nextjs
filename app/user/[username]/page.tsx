@@ -30,7 +30,7 @@ async function getUser(username: string) {
   // Check if blocked by current user
   let isBlockedByMe = false;
   if (currentUserId) {
-    const block = await (prisma as any).block.findFirst({
+    const block = await (prisma as any).userBlock.findFirst({
       where: {
         blockerId: currentUserId,
         blockedId: user.id
