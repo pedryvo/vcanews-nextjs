@@ -51,7 +51,7 @@ export default async function BlogPostsAdminPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {posts.map((post) => (
+              {posts.map((post: any) => (
                 <TableRow key={post.id} className="hover:bg-muted/30 transition-colors">
                   <TableCell className="max-w-[300px]">
                     <div className="flex flex-col gap-1">

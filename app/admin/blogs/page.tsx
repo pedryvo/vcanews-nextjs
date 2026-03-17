@@ -50,7 +50,7 @@ export default async function BlogsAdminPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {blogs.map((blog) => (
+              {blogs.map((blog: any) => (
                 <TableRow key={blog.id} className="hover:bg-muted/30 transition-colors">
                   <TableCell className="font-semibold">{blog.nome}</TableCell>
                   <TableCell>

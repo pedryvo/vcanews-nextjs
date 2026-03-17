@@ -44,7 +44,7 @@ export default async function CidadesAdminPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {cidades.map((cidade) => (
+              {cidades.map((cidade: any) => (
                 <TableRow key={cidade.id} className="hover:bg-muted/30 transition-colors">
                   <TableCell className="font-medium text-muted-foreground">#{cidade.id}</TableCell>
                   <TableCell className="font-semibold">{cidade.nome}</TableCell>
