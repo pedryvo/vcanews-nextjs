@@ -9,7 +9,18 @@ const globalForPrisma = globalThis as unknown as {
 // PostgreSQL standard client initialization with Driver Adapter
 // This is required for serverless/Edge contexts in Prisma 7
 const connectionString = process.env.DATABASE_URL;
-const pool = new Pool({ connectionString });
+
+if (!connectionString) {
+  console.error("CRITICAL: DATABASE_URL is not defined in the environment!");
+} else {
+  console.log("Database connection initializing...");
+}
+
+const pool = new Pool({ 
+  connectionString,
+  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false
+});
+
 const adapter = new PrismaPg(pool as any);
 
 export const prisma =

@@ -9,9 +9,19 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+    console.log("POST /api/admin/cidades - Body:", body);
+    
+    if (!process.env.DATABASE_URL) {
+      console.error("DATABASE_URL is missing in environment!");
+    }
+
     const cidade = await cidadeRepository.create(body);
     return NextResponse.json(cidade);
-  } catch (error) {
-    return NextResponse.json({ error: "Erro ao criar cidade" }, { status: 500 });
+  } catch (error: any) {
+    console.error("Error creating city:", error);
+    return NextResponse.json(
+      { error: "Erro ao criar cidade", details: error.message }, 
+      { status: 500 }
+    );
   }
 }
