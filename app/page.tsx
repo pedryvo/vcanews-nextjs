@@ -14,7 +14,18 @@ export default async function Home() {
   const session = await getServerSession(authOptions as any) as any;
   
   let showProfileCTA = false;
-  if (session?.user?.email) {
+  let ctaTitle = "Crie seu Perfil Profissional";
+  let ctaDescription = "Apareça no nosso guia para ser encontrado por clientes e receber orçamentos directos via chat!";
+  let ctaLink = "/settings/profile";
+  let ctaButtonText = "Configurar Agora";
+
+  if (!session) {
+    showProfileCTA = true;
+    ctaTitle = "Seja um Profissional VCA";
+    ctaDescription = "Faça login agora mesmo e crie o seu perfil profissional para oferecer seus serviços na cidade!";
+    ctaLink = "/auth/signin";
+    ctaButtonText = "Começar Agora";
+  } else if (session?.user?.email) {
     const user = await (prisma as any).user.findUnique({
       where: { email: session.user.email },
       select: { professionId: true, username: true }
@@ -22,6 +33,7 @@ export default async function Home() {
     // Se o usuário está logado mas não tem profissão ou username definido, mostramos o CTA
     if (user && (!user.professionId || !user.username)) {
       showProfileCTA = true;
+      ctaDescription = "Você ainda não aparece no nosso guia! Complete seu perfil para ser encontrado por clientes.";
     }
   }
 
@@ -40,7 +52,7 @@ export default async function Home() {
       </header>
 
       {showProfileCTA && (
-        <Link href="/settings/profile" className="block mb-6 group">
+        <Link href={ctaLink} className="block mb-6 group">
           <div className="bg-rose-50 hover:bg-rose-100 p-6 rounded-[2rem] border-2 border-rose-200 shadow-sm transition-all flex items-center gap-6 overflow-hidden relative group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/5 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110" />
             <div className="bg-rose-600 text-white p-3 rounded-2xl shadow-lg">
@@ -52,15 +64,15 @@ export default async function Home() {
                   <Sparkles className="h-3 w-3" /> Essencial
                 </span>
                 <h3 className="text-sm font-black uppercase tracking-widest text-rose-900">
-                  Crie seu Perfil Profissional
+                  {ctaTitle}
                 </h3>
               </div>
               <p className="text-rose-800 text-sm font-medium leading-tight">
-                Você ainda não aparece no nosso guia! Complete seu perfil para ser encontrado por clientes e receber orçamentos.
+                {ctaDescription}
               </p>
             </div>
             <div className="hidden sm:flex items-center gap-2 text-rose-600 font-bold text-xs uppercase tracking-tighter group-hover:gap-3 transition-all">
-              Configurar Agora <ArrowRight className="h-4 w-4" />
+              {ctaButtonText} <ArrowRight className="h-4 w-4" />
             </div>
           </div>
         </Link>
