@@ -16,9 +16,7 @@
     "@auth/prisma-adapter": "^2.11.1",
     "@extractus/article-extractor": "^8.0.20",
     "@hookform/resolvers": "^5.2.2",
-    "@prisma/adapter-better-sqlite3": "^7.5.0",
     "@prisma/client": "^7.5.0",
-    "better-sqlite3": "^12.6.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.577.0",
@@ -41,7 +39,6 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20.19.37",
     "@types/node-cron": "^3.0.11",
     "@types/react": "^19",
