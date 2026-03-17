@@ -12,8 +12,8 @@ export default function SignInPage() {
 
   const handleSignIn = async () => {
     setIsLoading(true);
-    // Pequeno delay para garantir que o feedback visual seja percebido
-    await new Promise(resolve => setTimeout(resolve, 300));
+    // Reduzido ao mínimo para não atrasar o redirecionamento real
+    await new Promise(resolve => setTimeout(resolve, 50));
     try {
       await signIn("google", { callbackUrl: "/" });
     } catch (error) {
