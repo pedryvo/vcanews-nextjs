@@ -69,6 +69,24 @@ export default function MyAdsPage() {
     }
   };
 
+  const handleMarkAsSold = async (id: string) => {
+    try {
+      const res = await fetch(`/api/marketplace/${id}`, { 
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "SOLD" })
+      });
+      if (res.ok) {
+        toast.success("Anúncio marcado como vendido!");
+        fetchUserAds();
+      } else {
+        toast.error("Erro ao atualizar anúncio");
+      }
+    } catch (error) {
+      toast.error("Erro na conexão");
+    }
+  };
+
   const handleDelete = async (id: string) => {
     try {
       const res = await fetch(`/api/marketplace/${id}`, { method: "DELETE" });
@@ -112,6 +130,8 @@ export default function MyAdsPage() {
         return <Badge className="bg-orange-500/10 text-orange-600 border-orange-100 gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest"><Clock className="h-3 w-3" /> Em Revisão</Badge>;
       case "REJECTED":
         return <Badge className="bg-destructive/10 text-destructive border-destructive/10 gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest"><XCircle className="h-3 w-3" /> Rejeitado</Badge>;
+      case "SOLD":
+        return <Badge className="bg-slate-500/10 text-slate-600 border-slate-100 gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest"><CheckCircle2 className="h-3 w-3" /> Vendido</Badge>;
       default:
         return null;
     }
@@ -159,7 +179,10 @@ export default function MyAdsPage() {
           <div className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {ads.map((ad) => (
-                <Card key={ad.id} className="group overflow-hidden rounded-[2rem] border-2 shadow-xl hover:shadow-2xl transition-all duration-300 bg-background">
+                <Card key={ad.id} className={cn(
+                  "group overflow-hidden rounded-[2rem] border-2 shadow-xl hover:shadow-2xl transition-all duration-300 bg-background",
+                  ad.status === "SOLD" && "opacity-60 grayscale-[0.5]"
+                )}>
                   <div className="relative aspect-[4/3] overflow-hidden bg-muted">
                     <img 
                       src={ad.images[0]?.url || "/placeholder-ad.png"} 
@@ -194,7 +217,7 @@ export default function MyAdsPage() {
                   <CardFooter className="p-4 pt-0 gap-2">
                     <Dialog open={editingAdId === ad.id} onOpenChange={(open) => setEditingAdId(open ? ad.id : null)}>
                       <DialogTrigger asChild>
-                        <Button variant="outline" className="flex-1 rounded-xl h-10 border-2 font-bold uppercase text-[10px] tracking-widest gap-2">
+                        <Button variant="outline" className="flex-1 rounded-xl h-10 border-2 font-bold uppercase text-[10px] tracking-widest gap-2" disabled={ad.status === "SOLD"}>
                           <Pencil className="h-3.5 w-3.5" /> Editar
                         </Button>
                       </DialogTrigger>
@@ -212,6 +235,15 @@ export default function MyAdsPage() {
                         />
                       </DialogContent>
                     </Dialog>
+
+                    <Button 
+                      variant="ghost" 
+                      onClick={() => handleMarkAsSold(ad.id)}
+                      disabled={ad.status === "SOLD"}
+                      className="rounded-xl h-10 px-4 text-emerald-600 hover:bg-emerald-100 border-2 border-transparent font-bold uppercase text-[10px] tracking-widest gap-2"
+                    >
+                      Vendido
+                    </Button>
 
                     <Dialog>
                       <DialogTrigger asChild>

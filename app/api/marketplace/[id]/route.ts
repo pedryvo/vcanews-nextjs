@@ -130,3 +130,44 @@ export async function DELETE(
     return NextResponse.json({ error: "Erro ao excluir anúncio" }, { status: 500 });
   }
 }
+
+export async function PATCH(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const { id } = await params;
+    const body = await req.json();
+    const { status } = body;
+
+    // Only allow status updates
+    if (!status || !["SOLD", "APPROVED", "PENDING", "REJECTED"].includes(status)) {
+      return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+    }
+
+    // Check ownership
+    const existingAd = await (prisma as any).ad.findUnique({
+      where: { id },
+      select: { userId: true }
+    });
+
+    if (!existingAd || existingAd.userId !== (session.user as any).id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const ad = await (prisma as any).ad.update({
+      where: { id },
+      data: { status },
+    });
+
+    return NextResponse.json(ad);
+  } catch (error) {
+    console.error("Erro ao atualizar status do anúncio:", error);
+    return NextResponse.json({ error: "Erro ao atualizar status" }, { status: 500 });
+  }
+}

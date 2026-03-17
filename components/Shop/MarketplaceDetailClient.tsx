@@ -72,9 +72,10 @@ export default function MarketplaceDetailClient({ initialAd }: MarketplaceDetail
   const isAdmin = (session?.user as any)?.role === "ADMIN";
   const isPending = ad.status === "PENDING";
   const isRejected = ad.status === "REJECTED";
+  const isSold = ad.status === "SOLD";
 
-  // Se não estiver aprovado e não for o dono nem admin, não mostra
-  if (ad.status !== "APPROVED" && !isOwner && !isAdmin) {
+  // Se não estiver aprovado nem vendido e não for o dono nem admin, não mostra
+  if (ad.status !== "APPROVED" && ad.status !== "SOLD" && !isOwner && !isAdmin) {
     return (
       <div className="container mx-auto py-20 px-4 text-center space-y-4">
         <div className="bg-yellow-500/10 text-yellow-600 p-10 rounded-[3rem] border-2 border-yellow-500/20 inline-block">
@@ -178,6 +179,11 @@ export default function MarketplaceDetailClient({ initialAd }: MarketplaceDetail
                 <Badge variant="outline" className="border-2 font-bold text-[10px] px-3 py-1 uppercase tracking-widest text-muted-foreground">
                   {ad.subcategory.name}
                 </Badge>
+                {isSold && (
+                  <Badge className="bg-slate-500 text-white border-none font-black text-[10px] px-3 py-1 uppercase tracking-widest">
+                    Vendido
+                  </Badge>
+                )}
               </div>
               <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter italic leading-none">
                 {ad.title}

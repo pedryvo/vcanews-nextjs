@@ -126,6 +126,7 @@ enum AdStatus {
   PENDING
   APPROVED
   REJECTED
+  SOLD
 }
 
 model AdImage {
