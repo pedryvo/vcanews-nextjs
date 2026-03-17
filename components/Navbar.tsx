@@ -16,11 +16,11 @@ export default function Navbar() {
             </span>
           </Link>
           <div className="hidden md:flex gap-6 items-center">
-            <Link 
-              href="/problemas-na-cidade" 
-              className="text-sm font-medium transition-colors hover:text-primary"
+            <Link
+              href="/denuncias"
+              className="text-xs font-bold px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-black rounded-md transition-all uppercase tracking-tight shadow-sm"
             >
-              Problemas na Cidade
+              DENÚNCIAS DA CIDADE
             </Link>
           </div>
         </div>
