@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle, CheckCircle2, Loader2, ImagePlus, X } from "lucide-react";
+import { useImageUpload } from "@/hooks/use-image-upload";
+import { createDenuncia } from "@/actions/denuncia-actions";
 
 interface DenunciaFormProps {
   onCreated?: () => void;
@@ -16,9 +18,9 @@ export function DenunciaForm({ onCreated }: DenunciaFormProps) {
   const [descricao, setDescricao] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<"admin" | "pending" | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { upload, loading } = useImageUpload();
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
@@ -37,89 +39,34 @@ export function DenunciaForm({ onCreated }: DenunciaFormProps) {
     setPreview(null);
   }
 
-  /** Comprime a imagem no browser usando Canvas antes de fazer upload */
-  async function compressImage(file: File): Promise<Blob> {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      const url = URL.createObjectURL(file);
-      img.onload = () => {
-        URL.revokeObjectURL(url);
-        const MAX = 900; // px máximo em qualquer dimensão
-        let { width, height } = img;
-        if (width > MAX || height > MAX) {
-          const ratio = Math.min(MAX / width, MAX / height);
-          width = Math.round(width * ratio);
-          height = Math.round(height * ratio);
-        }
-        const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d")!;
-        ctx.drawImage(img, 0, 0, width, height);
-        canvas.toBlob(
-          (blob) => {
-            if (blob) resolve(blob);
-            else reject(new Error("Falha ao comprimir imagem"));
-          },
-          "image/webp",
-          0.78,
-        );
-      };
-      img.onerror = reject;
-      img.src = url;
-    });
-  }
-
-  async function uploadImage(): Promise<string | null> {
-    if (!file) return null;
-    const compressed = await compressImage(file);
-    const form = new FormData();
-    form.append("file", new File([compressed], "photo.webp", { type: "image/webp" }));
-    form.append("folder", "denuncias");
-    const res = await fetch("/api/upload", { method: "POST", body: form });
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      throw new Error(data.error ?? "Erro ao fazer upload da imagem");
-    }
-    const data = await res.json();
-    return data.url;
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
     setError(null);
     setSuccess(null);
 
     try {
-      // Upload photo first if selected
+      // Upload photo first if selected using the hook
       let imageUrl: string | null = null;
       if (file) {
-        imageUrl = await uploadImage();
+        imageUrl = await upload(file, "denuncias");
       }
 
-      const res = await fetch("/api/denuncias", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ titulo, descricao, imageUrl }),
+      // Use Server Action instead of fetch
+      const result = await createDenuncia({
+        titulo: titulo.trim(),
+        descricao: descricao.trim(),
+        imageUrl
       });
-
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error ?? "Erro ao criar denúncia");
-        return;
-      }
 
       setTitulo("");
       setDescricao("");
       setFile(null);
       setPreview(null);
-      setSuccess(data.isAdmin ? "admin" : "pending");
+      setSuccess(result.isAdmin ? "admin" : "pending");
       onCreated?.();
-    } catch (err: any) {
-      setError(err.message ?? "Erro de rede. Tente novamente.");
-    } finally {
-      setLoading(false);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Erro de rede. Tente novamente.";
+      setError(message);
     }
   }
 
@@ -214,3 +161,4 @@ export function DenunciaForm({ onCreated }: DenunciaFormProps) {
     </Card>
   );
 }
+

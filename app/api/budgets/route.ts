@@ -12,14 +12,14 @@ export async function POST(req: Request) {
     }
 
     const { receiverId, adId } = await req.json();
-    const senderId = (session?.user as any)?.id;
+    const senderId = session.user.id;
 
     if (senderId === receiverId) {
       return NextResponse.json({ error: "Você não pode pedir um orçamento para si mesmo" }, { status: 400 });
     }
 
     // Verificar se já existe uma conversa ABERTA entre esses dois usuários
-    const existingConversation = await (prisma as any).budgetConversation.findFirst({
+    const existingConversation = await prisma.budgetConversation.findFirst({
       where: {
         OR: [
           { senderId, receiverId, adId: adId || null, status: "OPEN" },
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
     }
 
     // Criar nova conversa
-    const conversation = await (prisma as any).budgetConversation.create({
+    const conversation = await prisma.budgetConversation.create({
       data: {
         senderId,
         receiverId,
@@ -55,7 +55,7 @@ export async function POST(req: Request) {
     await prisma.notification.create({
       data: {
         userId: receiverId,
-        type: (adId ? "MARKETPLACE_MESSAGE" : "BUDGET_MESSAGE") as any, 
+        type: adId ? "MARKETPLACE_MESSAGE" : "BUDGET_MESSAGE", 
         referenceId: conversation.id,
       }
     });
@@ -81,9 +81,9 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userId = (session?.user as any)?.id;
+    const userId = session.user.id;
 
-    const conversations = await (prisma as any).budgetConversation.findMany({
+    const conversations = await prisma.budgetConversation.findMany({
       where: {
         OR: [{ senderId: userId }, { receiverId: userId }],
       },

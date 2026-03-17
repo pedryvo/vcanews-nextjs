@@ -74,12 +74,11 @@ export class BlogPostRepository {
   async deleteDuplicates() {
     // This finding logic is useful if the @unique constraint wasn't always there 
     // or if we want to be absolutely sure.
-    const duplicates = await prisma.$queryRaw<any[]>`
+    const duplicates = await prisma.$queryRaw<{ url: string }[]>`
       SELECT url FROM "BlogPost"
       GROUP BY url
       HAVING COUNT(*) > 1
     `;
-
     if (duplicates.length === 0) return 0;
 
     let deletedCount = 0;

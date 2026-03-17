@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 import { NextAuthOptions } from "next-auth";
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma) as any,
+  adapter: PrismaAdapter(prisma as any),
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -15,15 +15,15 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   callbacks: {
-    async jwt({ token, user, trigger }: any) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
-        token.role = user.role || "USER";
-        token.username = (user as any).username;
-        token.isBlocked = (user as any).isBlocked;
+        token.role = user.role ?? "USER";
+        token.username = user.username;
+        token.isBlocked = user.isBlocked ?? false;
         token.name = user.name;
         token.picture = user.image;
-        token.birthDate = (user as any).birthDate;
+        token.birthDate = user.birthDate;
       }
 
       if (trigger === "update") {
@@ -46,17 +46,17 @@ export const authOptions: NextAuthOptions = {
 
       return token;
     },
-    async session({ session, token }: any) {
-      if (token && (session as any).user) {
-        (session as any).user.id = token.id;
-        (session as any).user.role = token.role;
-        (session as any).user.username = token.username;
-        (session as any).user.birthDate = token.birthDate;
-        (session as any).user.isBlocked = token.isBlocked;
+    async session({ session, token }) {
+      if (token && session.user) {
+        session.user.id = token.id;
+        session.user.role = token.role;
+        session.user.username = token.username;
+        session.user.birthDate = token.birthDate;
+        session.user.isBlocked = token.isBlocked;
       }
       return session;
     },
-    async signIn({ user }: any) {
+    async signIn({ user }) {
       if (user.isBlocked) {
         throw new Error("Sua conta está bloqueada.");
       }

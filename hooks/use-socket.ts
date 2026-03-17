@@ -8,8 +8,8 @@ export const useSocket = () => {
   const { data: session } = useSession();
 
   useEffect(() => {
-    if ((session as any)?.user?.id) {
-      const channelName = `user-${(session as any).user.id}`;
+    if (session?.user?.id) {
+      const channelName = `user-${session.user.id}`;
       pusherClient.subscribe(channelName);
 
       return () => {

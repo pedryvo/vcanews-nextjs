@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { prisma, Prisma } from "@/lib/db";
 
 export async function GET(req: Request) {
   try {
@@ -8,7 +8,7 @@ export async function GET(req: Request) {
     const categoryId = searchParams.get("categoryId");
     const professionId = searchParams.get("professionId");
 
-    const where: any = {
+    const where: Prisma.UserWhereInput = {
       professionId: { not: null },
       AND: [
         {
@@ -54,3 +54,4 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Erro ao buscar profissionais" }, { status: 500 });
   }
 }
+

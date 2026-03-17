@@ -1,25 +1,41 @@
-import NextAuth, { DefaultSession } from "next-auth";
+import NextAuth, { DefaultSession, DefaultUser } from "next-auth";
 import { JWT } from "next-auth/jwt";
+import { AdapterUser as BaseAdapterUser } from "next-auth/adapters";
 
 declare module "next-auth" {
   interface Session {
     user: {
       id: string;
-      role?: string;
-      username?: string;
+      role: string;
+      username?: string | null;
+      birthDate?: Date | null;
+      isBlocked: boolean;
     } & DefaultSession["user"];
   }
 
-  interface User {
-    id: string;
+  interface User extends DefaultUser {
+    role: string;
+    username?: string | null;
+    birthDate?: Date | null;
+    isBlocked: boolean;
+  }
+}
+
+declare module "next-auth/adapters" {
+  interface AdapterUser extends BaseAdapterUser {
     role?: string;
-    username?: string;
+    username?: string | null;
+    birthDate?: Date | null;
+    isBlocked?: boolean;
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
-    role?: string;
-    username?: string;
+    id: string;
+    role: string;
+    username?: string | null;
+    birthDate?: Date | null;
+    isBlocked: boolean;
   }
 }

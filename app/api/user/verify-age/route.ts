@@ -5,8 +5,8 @@ import { prisma } from "@/lib/db";
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions as any);
-    if (!(session as any)?.user) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -15,29 +15,26 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Data de nascimento é obrigatória" }, { status: 400 });
     }
 
-    const birthDateObj = new Date(birthDate);
+    const dateOfBirth = new Date(birthDate);
     const today = new Date();
-    let age = today.getFullYear() - birthDateObj.getFullYear();
-    const monthDiff = today.getMonth() - birthDateObj.getMonth();
-
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDateObj.getDate())) {
+    let age = today.getFullYear() - dateOfBirth.getFullYear();
+    const m = today.getMonth() - dateOfBirth.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < dateOfBirth.getDate())) {
       age--;
     }
 
     if (age < 18) {
-      return NextResponse.json({ 
-        error: "Você deve ter pelo menos 18 anos para acessar este site." 
-      }, { status: 403 });
+      return NextResponse.json({ error: "Você deve ter pelo menos 18 anos" }, { status: 400 });
     }
 
     await prisma.user.update({
-      where: { id: (session as any).user.id },
-      data: { birthDate: birthDateObj },
+      where: { id: session.user.id },
+      data: { birthDate: dateOfBirth },
     });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error verifying age:", error);
-    return NextResponse.json({ error: "Erro interno no servidor" }, { status: 500 });
+    console.error("Verify age error:", error);
+    return NextResponse.json({ error: "Erro ao verificar idade" }, { status: 500 });
   }
 }

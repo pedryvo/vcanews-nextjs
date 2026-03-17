@@ -1,17 +1,19 @@
-import { prisma } from "@/lib/db";
-import { Prisma } from "@/lib/generated/prisma";
+import { prisma, Prisma } from "@/lib/db";
 
 export class BlogRepository {
   async getAll(skip?: number, take?: number) {
     return prisma.blog.findMany({
-      include: { cidade: true },
       skip,
       take,
     });
   }
 
-  async count() {
-    return prisma.blog.count();
+  async getAllWithCity(skip?: number, take?: number) {
+    return prisma.blog.findMany({
+      include: { cidade: true },
+      skip,
+      take,
+    });
   }
 
   async getById(id: number) {
@@ -36,6 +38,10 @@ export class BlogRepository {
     return prisma.blog.delete({
       where: { id },
     });
+  }
+
+  async count() {
+    return prisma.blog.count();
   }
 }
 

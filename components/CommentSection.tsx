@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Send, MessageSquare } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface Comment {
   id: string;
@@ -24,52 +25,44 @@ interface CommentSectionProps {
 
 export function CommentSection({ denunciaId }: CommentSectionProps) {
   const { data: session } = useSession();
-  const [comments, setComments] = useState<Comment[]>([]);
+  const queryClient = useQueryClient();
   const [newComment, setNewComment] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [posting, setPosting] = useState(false);
 
-  useEffect(() => {
-    async function fetchComments() {
-      try {
-        const res = await fetch(`/api/denuncias/${denunciaId}/comments`);
-        if (res.ok) {
-          const data = await res.json();
-          setComments(data);
-        }
-      } finally {
-        setLoading(false);
-      }
+  const { data: comments = [], isLoading } = useQuery<Comment[]>({
+    queryKey: ["comments", denunciaId],
+    queryFn: async () => {
+      const res = await fetch(`/api/denuncias/${denunciaId}/comments`);
+      if (!res.ok) throw new Error("Failed to fetch comments");
+      return res.json();
     }
-    fetchComments();
-  }, [denunciaId]);
+  });
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!newComment.trim() || posting) return;
-
-    setPosting(true);
-    try {
+  const mutation = useMutation({
+    mutationFn: async (text: string) => {
       const res = await fetch(`/api/denuncias/${denunciaId}/comments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: newComment }),
+        body: JSON.stringify({ text }),
       });
-
-      if (res.ok) {
-        const comment = await res.json();
-        setComments((prev) => [...prev, comment]);
-        setNewComment("");
-      }
-    } finally {
-      setPosting(false);
+      if (!res.ok) throw new Error("Failed to post comment");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["comments", denunciaId] });
+      setNewComment("");
     }
+  });
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!newComment.trim() || mutation.isPending) return;
+    mutation.mutate(newComment);
   }
 
   const isDev = process.env.NODE_ENV === "development";
   const displayForm = isDev || !!session;
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex justify-center py-4">
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -129,10 +122,10 @@ export function CommentSection({ denunciaId }: CommentSectionProps) {
           <Button 
             type="submit" 
             size="icon" 
-            disabled={posting || !newComment.trim()} 
+            disabled={mutation.isPending || !newComment.trim()} 
             className="shrink-0 h-10 w-10 rounded-xl"
           >
-            {posting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           </Button>
         </form>
       ) : (

@@ -1,47 +1,26 @@
-import { prisma } from "@/lib/db";
+import { prisma, Prisma } from "@/lib/db";
 
-export const denunciaRepository = {
-  async create(data: { titulo: string; descricao: string; userId: string; imageUrl?: string | null }) {
-    return prisma.denuncia.create({ data });
-  },
-
-  async getApproved() {
+export class DenunciaRepository {
+  async getAllApproved() {
     return prisma.denuncia.findMany({
       where: { aprovado: true },
       include: {
-        user: { select: { id: true, name: true, image: true } },
-        reactions: {
-          include: {
-            user: { select: { id: true, name: true, image: true } },
-          },
-        },
+        user: { select: { name: true, image: true, username: true } },
+        _count: { select: { comments: true, reactions: true } },
       },
       orderBy: { createdAt: "desc" },
     });
-  },
+  }
 
-  async getPending() {
+  async getAllPending() {
     return prisma.denuncia.findMany({
       where: { aprovado: false },
       include: {
-        user: { select: { id: true, name: true, image: true } },
-        _count: { select: { reactions: true } },
+        user: { select: { name: true, image: true, username: true } },
       },
       orderBy: { createdAt: "desc" },
     });
-  },
-
-  async approve(id: string) {
-    return prisma.denuncia.update({ where: { id }, data: { aprovado: true } });
-  },
-
-  async reject(id: string) {
-    return prisma.denuncia.delete({ where: { id } });
-  },
-
-  async deleteById(id: string) {
-    return prisma.denuncia.delete({ where: { id } });
-  },
+  }
 
   async getAll(skip?: number, take?: number) {
     return prisma.denuncia.findMany({
@@ -53,9 +32,48 @@ export const denunciaRepository = {
       },
       orderBy: { createdAt: "desc" },
     });
-  },
+  }
+
+  async getById(id: string) {
+    return prisma.denuncia.findUnique({
+      where: { id },
+      include: {
+        user: { select: { id: true, name: true, image: true, username: true } },
+        _count: { select: { comments: true, reactions: true } },
+      },
+    });
+  }
+
+  async create(data: Prisma.DenunciaUncheckedCreateInput) {
+    return prisma.denuncia.create({ data });
+  }
+
+  async getLatestApproved(limit: number = 5) {
+    return prisma.denuncia.findMany({
+      where: { aprovado: true },
+      take: limit,
+      orderBy: { createdAt: "desc" },
+      include: {
+        user: { select: { name: true, image: true } },
+      },
+    });
+  }
+
+  async approve(id: string) {
+    return prisma.denuncia.update({ where: { id }, data: { aprovado: true } });
+  }
+
+  async reject(id: string) {
+    return prisma.denuncia.delete({ where: { id } });
+  }
+
+  async deleteById(id: string) {
+    return prisma.denuncia.delete({ where: { id } });
+  }
 
   async count() {
     return prisma.denuncia.count();
-  },
-};
+  }
+}
+
+export const denunciaRepository = new DenunciaRepository();

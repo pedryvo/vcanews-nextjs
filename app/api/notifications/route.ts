@@ -5,10 +5,10 @@ import { prisma } from "@/lib/db";
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions as any);
-    if (!(session as any)?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const session = await getServerSession(authOptions);
+    if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const userId = (session as any).user.id;
+    const userId = session.user.id;
 
     const notifications = await prisma.notification.findMany({
       where: { userId },
@@ -77,16 +77,17 @@ export async function GET() {
 
     return NextResponse.json({ notifications: aggregated, unreadCount });
   } catch (error) {
+    console.error("Notifications GET error:", error);
     return NextResponse.json({ error: "Erro ao buscar notificações" }, { status: 500 });
   }
 }
 
 export async function PATCH(req: Request) {
   try {
-    const session = await getServerSession(authOptions as any);
-    if (!(session as any)?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const session = await getServerSession(authOptions);
+    if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const userId = (session as any).user.id;
+    const userId = session.user.id;
 
     await prisma.notification.updateMany({
       where: { userId, read: false },
@@ -98,3 +99,4 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ error: "Erro ao atualizar notificações" }, { status: 500 });
   }
 }
+

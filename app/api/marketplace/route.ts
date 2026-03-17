@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/db";
+import { prisma, Prisma } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { NextResponse } from "next/server";
@@ -13,7 +13,7 @@ export async function GET(req: Request) {
   const limit = 12;
   const skip = (page - 1) * limit;
 
-  const where: Record<string, any> = {};
+  const where: Prisma.AdWhereInput = {};
   const userId = searchParams.get("userId");
   
   if (userId) {
@@ -29,14 +29,15 @@ export async function GET(req: Request) {
   }
 
   if (minPrice || maxPrice) {
-    where.price = {};
-    if (minPrice) (where.price as any).gte = parseFloat(minPrice);
-    if (maxPrice) (where.price as any).lte = parseFloat(maxPrice);
+    const priceFilter: Prisma.DecimalFilter = {};
+    if (minPrice) priceFilter.gte = new Prisma.Decimal(minPrice);
+    if (maxPrice) priceFilter.lte = new Prisma.Decimal(maxPrice);
+    where.price = priceFilter;
   }
 
   try {
     const [ads, total] = await Promise.all([
-      (prisma as any).ad.findMany({
+      prisma.ad.findMany({
         where,
         include: {
           user: {
@@ -61,7 +62,7 @@ export async function GET(req: Request) {
         skip,
         take: limit,
       }),
-      (prisma as any).ad.count({ where }),
+      prisma.ad.count({ where }),
     ]);
 
     return NextResponse.json({
@@ -89,13 +90,13 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { title, description, price, subcategoryId, images } = body;
 
-    const ad = await (prisma as any).ad.create({
+    const ad = await prisma.ad.create({
       data: {
         title,
         description,
-        price: parseFloat(price),
+        price: new Prisma.Decimal(price),
         subcategoryId,
-        userId: (session?.user as any)?.id,
+        userId: session.user.id,
         images: {
           create: images.map((url: string) => ({ url })),
         },

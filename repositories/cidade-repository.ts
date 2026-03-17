@@ -1,17 +1,17 @@
-import { prisma } from "@/lib/db";
-import { Prisma } from "@/lib/generated/prisma";
+import { prisma, Prisma } from "@/lib/db";
 
 export class CidadeRepository {
   async getAll(skip?: number, take?: number) {
     return prisma.cidade.findMany({
       skip,
       take,
-      orderBy: { nome: "asc" },
     });
   }
 
-  async count() {
-    return prisma.cidade.count();
+  async getAllWithBlogs() {
+    return prisma.cidade.findMany({
+      include: { blogs: true },
+    });
   }
 
   async getById(id: number) {
@@ -20,11 +20,11 @@ export class CidadeRepository {
     });
   }
 
-  async create(data: Prisma.CidadeCreateInput) {
+  async create(data: Prisma.CidadeUncheckedCreateInput) {
     return prisma.cidade.create({ data });
   }
 
-  async update(id: number, data: Prisma.CidadeUpdateInput) {
+  async update(id: number, data: Prisma.CidadeUncheckedUpdateInput) {
     return prisma.cidade.update({
       where: { id },
       data,
@@ -35,6 +35,10 @@ export class CidadeRepository {
     return prisma.cidade.delete({
       where: { id },
     });
+  }
+
+  async count() {
+    return prisma.cidade.count();
   }
 }
 

@@ -4,30 +4,31 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
 export async function GET() {
-  const session = await getServerSession(authOptions as any);
+  const session = await getServerSession(authOptions);
 
-  if (!(session as any)?.user?.email) {
+  if (!session?.user?.email) {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   }
 
   try {
     const images = await prisma.portfolioImage.findMany({
       where: {
-        user: { email: (session as any).user.email }
+        user: { email: session.user.email }
       },
       orderBy: { order: "asc" }
     });
 
     return NextResponse.json(images);
   } catch (error) {
+    console.error("Portfolio GET error:", error);
     return NextResponse.json({ error: "Erro ao buscar portfólio" }, { status: 500 });
   }
 }
 
 export async function POST(req: Request) {
-  const session = await getServerSession(authOptions as any);
+  const session = await getServerSession(authOptions);
 
-  if (!(session as any)?.user?.email) {
+  if (!session?.user?.email) {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   }
 
@@ -43,7 +44,7 @@ export async function POST(req: Request) {
     }
 
     const user = await prisma.user.findUnique({
-      where: { email: (session as any).user.email }
+      where: { email: session.user.email }
     });
 
     if (!user) {
@@ -56,7 +57,7 @@ export async function POST(req: Request) {
         where: { userId: user.id }
       }),
       prisma.portfolioImage.createMany({
-        data: images.map((img, index) => ({
+        data: images.map((img: { url: string, order?: number }, index: number) => ({
           userId: user.id,
           url: img.url,
           order: img.order ?? index,

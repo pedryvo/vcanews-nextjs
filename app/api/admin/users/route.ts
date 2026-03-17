@@ -1,17 +1,10 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/db";
-
-async function getAdminSession() {
-  const session = await getServerSession(authOptions as any);
-  if (!session || (session as any).user?.role !== "ADMIN") return null;
-  return session;
-}
+import { getAdminSession, unauthorizedResponse } from "@/lib/api-utils";
+import { prisma, Prisma } from "@/lib/db";
 
 export async function GET(req: Request) {
   const session = await getAdminSession();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session) return unauthorizedResponse();
 
   const { searchParams } = new URL(req.url);
   const q = searchParams.get("q") || "";
@@ -19,16 +12,16 @@ export async function GET(req: Request) {
   const limit = parseInt(searchParams.get("limit") || "50");
   const skip = (page - 1) * limit;
 
-  const where = {
+  const where: Prisma.UserWhereInput = {
     OR: [
-      { name: { contains: q, mode: "insensitive" } as any },
-      { email: { contains: q, mode: "insensitive" } as any },
-      { username: { contains: q, mode: "insensitive" } as any },
+      { name: { contains: q, mode: "insensitive" } },
+      { email: { contains: q, mode: "insensitive" } },
+      { username: { contains: q, mode: "insensitive" } },
     ],
   };
 
   const [users, total] = await Promise.all([
-    (prisma as any).user.findMany({
+    prisma.user.findMany({
       where,
         select: {
           id: true,
@@ -56,7 +49,7 @@ export async function GET(req: Request) {
       skip,
       take: limit,
     }),
-    (prisma as any).user.count({ where }),
+    prisma.user.count({ where }),
   ]);
 
   return NextResponse.json({

@@ -9,8 +9,18 @@ import { Badge } from "@/components/ui/badge";
 import { CommentSection } from "@/components/CommentSection";
 import Link from "next/link";
 
-type User = { id: string; name: string | null; image: string | null };
-type Reaction = { id: string; type: string; user: User };
+interface UserInfo {
+  id: string;
+  name: string | null;
+  image: string | null;
+  username?: string | null;
+}
+
+interface Reaction {
+  id: string;
+  type: string;
+  user: UserInfo;
+}
 
 interface DenunciaCardProps {
   denuncia: {
@@ -19,7 +29,7 @@ interface DenunciaCardProps {
     descricao: string;
     imageUrl?: string | null;
     createdAt: string;
-    user: User;
+    user: UserInfo;
     reactions: Reaction[];
   };
   currentUserId?: string;
@@ -41,7 +51,9 @@ export function DenunciaCard({ denuncia, currentUserId }: DenunciaCardProps) {
           const data = await res.json();
           setCommentCount(data.length);
         }
-      } catch (e) {}
+      } catch (e) {
+        console.error("Error fetching comment count:", e);
+      }
     }
     fetchCommentCount();
   }, [denuncia.id]);
@@ -82,6 +94,8 @@ export function DenunciaCard({ denuncia, currentUserId }: DenunciaCardProps) {
           ];
         });
       }
+    } catch (error) {
+       console.error("Error reacting to denuncia:", error);
     } finally {
       setLoading(false);
     }
@@ -208,3 +222,4 @@ export function DenunciaCard({ denuncia, currentUserId }: DenunciaCardProps) {
     </Card>
   );
 }
+
