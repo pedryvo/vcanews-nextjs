@@ -1,25 +1,35 @@
 import AdminLayout from "@/components/admin/AdminLayout";
 export const dynamic = "force-dynamic";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, Rss, Newspaper } from "lucide-react";
+import { Building2, Rss, Newspaper, Users, ShoppingBag, Briefcase, AlertCircle } from "lucide-react";
 import { cidadeRepository } from "@/repositories/cidade-repository";
 import { blogRepository } from "@/repositories/blog-repository";
 import { blogPostRepository } from "@/repositories/blog-post-repository";
+import { denunciaRepository } from "@/repositories/denuncia-repository";
+import { prisma } from "@/lib/db";
 
 export default async function AdminDashboard() {
   console.log("[DEBUG] AdminDashboard: Iniciando renderização...");
   const isDev = process.env.NODE_ENV === "development";
 
-  const [cidades, blogs, totalPosts] = await Promise.all([
+  const [cidades, blogs, totalPosts, totalUsers, totalAds, totalProfessions, totalDenuncias] = await Promise.all([
     cidadeRepository.getAll(),
     blogRepository.getAll(),
     blogPostRepository.count(),
+    (prisma as any).user.count(),
+    (prisma as any).ad.count(),
+    (prisma as any).user.count({ where: { professionId: { not: null } } }),
+    denunciaRepository.count(),
   ]);
 
   const stats = [
     { name: "Cidades", value: cidades.length, icon: Building2 },
     { name: "Blogs", value: blogs.length, icon: Rss },
     { name: "Notícias", value: totalPosts, icon: Newspaper },
+    { name: "Usuários", value: totalUsers, icon: Users },
+    { name: "Profissionais", value: totalProfessions, icon: Briefcase },
+    { name: "Anúncios", value: totalAds, icon: ShoppingBag },
+    { name: "Denúncias", value: totalDenuncias, icon: AlertCircle },
   ];
 
   return (
@@ -30,7 +40,7 @@ export default async function AdminDashboard() {
           <p className="text-muted-foreground">Visão geral do sistema de notícias.</p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat) => (
             <Card key={stat.name}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
