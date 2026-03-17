@@ -48,7 +48,7 @@ export default function DenunciaDetailPage({ params }: { params: Promise<{ id: s
     );
   }
 
-  const currentUserId = (session?.user as any)?.id;
+  const currentUserId = ((session as any)?.user as any)?.id;
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-3xl space-y-6">

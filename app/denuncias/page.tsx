@@ -31,7 +31,7 @@ export default function DenunciasPage() {
     fetchDenuncias();
   }, [fetchDenuncias]);
 
-  const currentUserId = isDev ? "dev-user" : (session?.user as any)?.id;
+  const currentUserId = isDev ? "dev-user" : ((session as any)?.user as any)?.id;
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-3xl">
@@ -45,13 +45,13 @@ export default function DenunciasPage() {
         </p>
       </div>
 
-      {session?.user && (
+      {(session as any)?.user && (
         <div className="mb-8">
           <DenunciaForm onCreated={fetchDenuncias} />
         </div>
       )}
 
-      {!session?.user && (
+      {!(session as any)?.user && (
         <div className="mb-8 flex justify-center">
           <Button 
             onClick={() => signIn("google")}

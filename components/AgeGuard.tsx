@@ -10,8 +10,8 @@ export function AgeGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    if (status === "authenticated" && session?.user) {
-      const user = session.user as any;
+    if (status === "authenticated" && (session as any)?.user) {
+      const user = (session as any)?.user as any;
       if (user.isBlocked && pathname !== "/auth/blocked") {
         router.push("/auth/blocked");
         return;

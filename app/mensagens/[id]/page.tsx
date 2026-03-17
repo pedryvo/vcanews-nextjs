@@ -72,7 +72,7 @@ export default function ChatRoomPage({ params }: { params: Promise<{ id: string 
       socket.emit("join-room", id);
 
       socket.on("new-message", (message: Message) => {
-        if (message.senderId !== (session?.user as any)?.id) {
+        if (message.senderId !== ((session as any)?.user as any)?.id) {
           setMessages((prev) => [...prev, message]);
         }
       });
@@ -148,7 +148,7 @@ export default function ChatRoomPage({ params }: { params: Promise<{ id: string 
     );
   }
 
-  const otherUser = conversation.senderId === (session?.user as any)?.id ? conversation.receiver : conversation.sender;
+  const otherUser = conversation.senderId === ((session as any)?.user as any)?.id ? conversation.receiver : conversation.sender;
   const isFinished = conversation.status === "FINISHED";
 
   return (
@@ -236,7 +236,7 @@ export default function ChatRoomPage({ params }: { params: Promise<{ id: string 
 
           <div className="space-y-4">
             {messages.map((msg, index) => {
-              const isMe = msg.senderId === (session?.user as any)?.id;
+              const isMe = msg.senderId === ((session as any)?.user as any)?.id;
               return (
                 <div key={msg.id} className={cn("flex", isMe ? "justify-end" : "justify-start")}>
                   <div className={cn(

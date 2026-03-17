@@ -129,7 +129,7 @@ export default function PublicProfilePage({ params }: PublicProfileProps) {
     );
   }
 
-  const isOwnProfile = session?.user?.id === user.id;
+  const isOwnProfile = (session as any)?.user?.id === user.id;
 
   return (
     <div className="min-h-screen bg-muted/30 pb-20">

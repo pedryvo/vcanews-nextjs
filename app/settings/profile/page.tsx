@@ -266,7 +266,7 @@ export default function ProfileSettingsPage() {
             <CardContent className="p-6 flex flex-col items-center -mt-12 relative z-10">
               <div className="relative group/avatar cursor-pointer w-24 h-24 mb-4">
                 <Avatar className="w-full h-full border-4 border-background shadow-lg rounded-full">
-                  <AvatarImage src={formData.image || session?.user?.image || ""} className="object-cover" />
+                  <AvatarImage src={formData.image || (session as any)?.user?.image || ""} className="object-cover" />
                   <AvatarFallback className="text-xl bg-primary text-primary-foreground">
                     {formData.name?.[0] || "?"}
                   </AvatarFallback>

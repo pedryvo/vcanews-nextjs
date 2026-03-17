@@ -61,7 +61,7 @@ export default function MensagensPage() {
   }
 
   const filtered = conversations.filter(c => {
-    const other = c.senderId === (session?.user as any).id ? c.receiver : c.sender;
+    const other = c.senderId === ((session as any)?.user as any).id ? c.receiver : c.sender;
     return other.name.toLowerCase().includes(search.toLowerCase()) || 
            other.username.toLowerCase().includes(search.toLowerCase());
   });
@@ -88,7 +88,7 @@ export default function MensagensPage() {
         <div className="grid gap-3">
           {filtered.length > 0 ? (
             filtered.map((c) => {
-              const other = c.senderId === (session?.user as any).id ? c.receiver : c.sender;
+              const other = c.senderId === ((session as any)?.user as any).id ? c.receiver : c.sender;
               const lastMsg = c.messages[0]?.content || "Inicie a conversa...";
               const isFinished = c.status === "FINISHED";
 

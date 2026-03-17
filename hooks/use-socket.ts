@@ -16,8 +16,8 @@ export const useSocket = () => {
 
       socketInstance.on("connect", () => {
         console.log("Connected to websocket");
-        if ((session?.user as any)?.id) {
-          socketInstance.emit("join-user", (session.user as any).id);
+        if ((session as any)?.user?.id) {
+          socketInstance.emit("join-user", (session as any).user.id);
         }
       });
 
