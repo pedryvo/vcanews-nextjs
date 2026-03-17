@@ -31,11 +31,12 @@ export class NewsSyncService {
       console.log(`[SYNC] OK: ${blogs.length} blogs encontrados.`);
 
       for (const blog of blogs) {
-        console.info(`[SYNC] > Blog: ${blog.nome} (ID: ${blog.id})`);
+        console.log(`[SYNC] > Blog: ${blog.nome} (ID: ${blog.id})`);
         try {
+          console.log(`[SYNC]   - Baixando RSS: ${blog.rssUrl}`);
           const feed = await parser.parseURL(blog.rssUrl);
           const items = feed.items || [];
-          console.info(`[SYNC]   - RSS OK: ${items.length} itens`);
+          console.log(`[SYNC]   - RSS OK: ${items.length} itens`);
 
           let countNew = 0;
           for (const item of items) {

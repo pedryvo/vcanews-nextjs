@@ -18,9 +18,14 @@ if (!connectionString) {
 
 const pool = new Pool({ 
   connectionString,
-  max: 1, // Recomendado para Serverless
-  connectionTimeoutMillis: 5000,
-  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false
+  max: 1, 
+  connectionTimeoutMillis: 15000, // Aumentado para 15s (Neon cold start)
+  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
+  idleTimeoutMillis: 30000,
+});
+
+pool.on('error', (err) => {
+  console.error('[DB] Erro inesperado no pool de conexões:', err);
 });
 
 const adapter = new PrismaPg(pool as any);
@@ -29,7 +34,9 @@ export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
     adapter,
-    log: ["query"],
+    log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
   });
+
+console.log("[DB] Prisma Client carregado com adapter pg.");
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
