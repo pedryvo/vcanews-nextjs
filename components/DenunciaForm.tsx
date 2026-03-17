@@ -75,6 +75,7 @@ export function DenunciaForm({ onCreated }: DenunciaFormProps) {
     const compressed = await compressImage(file);
     const form = new FormData();
     form.append("file", new File([compressed], "photo.webp", { type: "image/webp" }));
+    form.append("folder", "denuncias");
     const res = await fetch("/api/upload", { method: "POST", body: form });
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));

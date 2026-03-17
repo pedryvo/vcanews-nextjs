@@ -82,6 +82,7 @@ export function AdForm({ onSuccess, onCancel, ad, apiUrl }: AdFormProps) {
 
       const uploadData = new FormData();
       uploadData.append("file", compressedFile);
+      uploadData.append("folder", "marketplace");
 
       const res = await fetch("/api/upload", { method: "POST", body: uploadData });
       if (res.ok) {

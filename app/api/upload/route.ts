@@ -15,6 +15,7 @@ export async function POST(req: Request) {
 
   const formData = await req.formData();
   const file = formData.get("file") as File | null;
+  const folder = formData.get("folder") as string || "uploads";
 
   if (!file) {
     return NextResponse.json({ error: "Nenhum arquivo enviado" }, { status: 400 });
@@ -24,10 +25,15 @@ export async function POST(req: Request) {
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.webp`;
 
   if (isDev) {
-    // Save locally in public/uploads for dev
-    const uploadPath = join(process.cwd(), "public", "uploads", filename);
+    // Save locally in public/uploads/[folder] for dev
+    const fs = require("fs");
+    const dir = join(process.cwd(), "public", "uploads", folder);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    const uploadPath = join(dir, filename);
     await writeFile(uploadPath, buffer);
-    return NextResponse.json({ url: `/uploads/${filename}` });
+    return NextResponse.json({ url: `/uploads/${folder}/${filename}` });
   } else {
     // Use Vercel Blob in production
     if (!process.env.BLOB_READ_WRITE_TOKEN) {
@@ -36,7 +42,7 @@ export async function POST(req: Request) {
     }
 
     try {
-      const blob = await put(`denuncias/${filename}`, buffer, {
+      const blob = await put(`${folder}/${filename}`, buffer, {
         access: "public",
         contentType: "image/webp",
       });

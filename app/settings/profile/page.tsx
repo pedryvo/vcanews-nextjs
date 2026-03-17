@@ -186,6 +186,7 @@ export default function ProfileSettingsPage() {
 
       const formDataUpload = new FormData();
       formDataUpload.append("file", finalFile);
+      formDataUpload.append("folder", "profiles");
 
       const res = await fetch("/api/upload", {
         method: "POST",
