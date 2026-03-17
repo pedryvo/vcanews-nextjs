@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Mail, MessageSquare, Clock, User, Trash2, Search, ExternalLink, AlertCircle } from "lucide-react";
+import { Mail, MessageSquare, Clock, User, Trash2, Search, ExternalLink, AlertCircle, Info, Target } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
@@ -129,10 +129,24 @@ export default function AdminMessagesPage() {
                       </div>
                     </div>
 
-                    <div className="bg-slate-50/50 p-5 rounded-3xl border border-slate-100">
+                    <div className="bg-slate-50/50 p-5 rounded-3xl border border-slate-100 space-y-3">
                       <p className="text-slate-600 text-sm leading-relaxed italic">
                         "{msg.message}"
                       </p>
+                      
+                      <div className="pt-3 border-t border-slate-200/60 flex flex-wrap gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                        <span className="bg-white px-2 py-1 rounded-md border border-slate-100 flex items-center gap-1.5 transition-colors hover:border-blue-200 hover:text-blue-500">
+                          <Info className="h-3 w-3" />
+                          IP: {msg.ip || "Não capturado"}
+                        </span>
+                        <span className="bg-white px-2 py-1 rounded-md border border-slate-100 flex items-center gap-1.5 transition-colors hover:border-emerald-200 hover:text-emerald-500">
+                          <Target className="h-3 w-3" />
+                          {msg.location || "Localização desconhecida"}
+                        </span>
+                        <span className="bg-white px-2 py-1 rounded-md border border-slate-100 flex items-center gap-1.5 transition-colors hover:border-amber-200 hover:text-amber-500 max-w-[200px] truncate" title={msg.userAgent}>
+                          Navegador: {msg.userAgent || "N/A"}
+                        </span>
+                      </div>
                     </div>
                   </div>
 

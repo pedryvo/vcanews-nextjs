@@ -262,5 +262,8 @@ model ContactMessage {
   email     String
   subject   String
   message   String
+  ip        String?
+  userAgent String?
+  location  String?
   createdAt DateTime @default(now())
 }

@@ -32,12 +32,28 @@ export async function POST(req: Request) {
       );
     }
 
+    // Capturar metadados do solicitante
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || req.headers.get("x-real-ip") || "Unknown";
+    const userAgent = req.headers.get("user-agent") || "Unknown";
+    
+    const city = req.headers.get("x-vercel-ip-city");
+    const country = req.headers.get("x-vercel-ip-country");
+    const region = req.headers.get("x-vercel-ip-country-region");
+    
+    let location = "Localização desconhecida";
+    if (city && country) {
+      location = `${city}, ${region ? region + ", " : ""}${country}`;
+    }
+
     const newMessage = await (prisma as any).contactMessage.create({
       data: {
         name,
         email,
         subject,
         message,
+        ip,
+        userAgent,
+        location,
       },
     });
 
