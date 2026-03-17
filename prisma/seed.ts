@@ -178,37 +178,240 @@ async function main() {
 
   const productCategories = [
     {
-      name: "Eletrônicos & Celulares",
-      subcategories: ["Celulares e Smartphones", "Tablets e iPads", "Computadores e Notebooks", "Consoles e Games", "TVs e Áudio", "Câmeras e Drones", "Outros"],
+      name: "Eletrônicos & Tecnologia",
+      subcategories: [
+        "Celulares e Smartphones",
+        "Capas e Acessórios para Celular",
+        "Tablets e iPads",
+        "Smartwatches e Wearables",
+        "Computadores Desktop",
+        "Notebooks",
+        "Monitores",
+        "Teclados e Mouses",
+        "Impressoras e Scanners",
+        "HDs, SSDs e Armazenamento",
+        "Redes e Roteadores",
+        "Componentes de PC",
+        "Consoles",
+        "Jogos",
+        "Controles e Acessórios Gamer",
+        "TVs",
+        "Home Theater",
+        "Caixas de Som",
+        "Fones de Ouvido",
+        "Câmeras Fotográficas",
+        "Filmadoras",
+        "Drones",
+        "Outros"
+      ]
     },
     {
-      name: "Veículos & Acessórios",
-      subcategories: ["Carros e Sedans", "SUVs e Caminhonetes", "Motos e Scooters", "Peças e Acessórios", "Náutica", "Outros"],
+      name: "Veículos",
+      subcategories: [
+        "Carros",
+        "SUVs",
+        "Picapes",
+        "Vans e Utilitários",
+        "Carros Antigos",
+        "Carros Elétricos",
+        "Motos",
+        "Scooters",
+        "Quadriciclos",
+        "Barcos e Lanchas",
+        "Jet Ski",
+        "Peças Automotivas",
+        "Som Automotivo",
+        "Rodas e Pneus",
+        "Acessórios Automotivos",
+        "Outros"
+      ]
     },
     {
       name: "Imóveis",
-      subcategories: ["Apartamentos", "Casas", "Terrenos e Lotes", "Sítios e Fazendas", "Temporada", "Outros"],
+      subcategories: [
+        "Apartamentos",
+        "Casas",
+        "Kitnets e Studios",
+        "Coberturas",
+        "Condomínios",
+        "Terrenos",
+        "Lotes",
+        "Sítios",
+        "Fazendas",
+        "Chácaras",
+        "Imóveis Comerciais",
+        "Salas Comerciais",
+        "Galpões",
+        "Temporada",
+        "Quartos para Aluguel",
+        "Outros"
+      ]
     },
     {
-      name: "Moda & Beleza",
-      subcategories: ["Roupas Femininas", "Roupas Masculinas", "Calçados", "Relógios e Joias", "Beleza e Maquiagem", "Outros"],
+      name: "Moda & Acessórios",
+      subcategories: [
+        "Roupas Femininas",
+        "Roupas Masculinas",
+        "Moda Infantil",
+        "Calçados Femininos",
+        "Calçados Masculinos",
+        "Bolsas",
+        "Mochilas",
+        "Carteiras",
+        "Relógios",
+        "Joias",
+        "Bijuterias",
+        "Óculos de Sol",
+        "Acessórios de Moda",
+        "Outros"
+      ]
     },
     {
-      name: "Casa & Eletrodomésticos",
-      subcategories: ["Móveis", "Decoração", "Geladeiras e Freezers", "Fogões e Fornos", "Ar Condicionado", "Outros"],
+      name: "Beleza & Saúde",
+      subcategories: [
+        "Maquiagem",
+        "Perfumes",
+        "Cuidados com a Pele",
+        "Cuidados com o Cabelo",
+        "Barbeadores",
+        "Secadores e Chapinhas",
+        "Produtos de Barbearia",
+        "Suplementos",
+        "Equipamentos de Estética",
+        "Massagem e Relaxamento",
+        "Outros"
+      ]
+    },
+    {
+      name: "Casa, Móveis & Decoração",
+      subcategories: [
+        "Sofás",
+        "Mesas",
+        "Cadeiras",
+        "Guarda-Roupas",
+        "Camas",
+        "Colchões",
+        "Móveis Planejados",
+        "Estantes",
+        "Decoração",
+        "Quadros",
+        "Iluminação",
+        "Tapetes",
+        "Cortinas",
+        "Utensílios Domésticos",
+        "Organização",
+        "Outros"
+      ]
+    },
+    {
+      name: "Eletrodomésticos",
+      subcategories: [
+        "Geladeiras",
+        "Freezers",
+        "Fogões",
+        "Cooktops",
+        "Fornos",
+        "Micro-ondas",
+        "Máquinas de Lavar",
+        "Secadoras",
+        "Lava e Seca",
+        "Ar Condicionado",
+        "Ventiladores",
+        "Aspiradores",
+        "Purificadores de Água",
+        "Outros"
+      ]
     },
     {
       name: "Esportes & Lazer",
-      subcategories: ["Bicicletas", "Fitness e Musculação", "Camping e Pesca", "Instrumentos Musicais", "Outros"],
+      subcategories: [
+        "Bicicletas",
+        "Peças para Bicicleta",
+        "Equipamentos de Academia",
+        "Musculação",
+        "Corrida",
+        "Yoga e Pilates",
+        "Camping",
+        "Pesca",
+        "Skate",
+        "Patins",
+        "Surf",
+        "Instrumentos Musicais",
+        "Outros"
+      ]
     },
     {
-      name: "Companhia & Pets",
-      subcategories: ["Cães e Gatos", "Acessórios e Ração", "Serviços Pet", "Outros"],
+      name: "Bebês & Infantil",
+      subcategories: [
+        "Carrinhos de Bebê",
+        "Cadeirinhas para Carro",
+        "Berços",
+        "Roupas de Bebê",
+        "Brinquedos Infantis",
+        "Mamadeiras",
+        "Produtos de Higiene",
+        "Outros"
+      ]
+    },
+    {
+      name: "Pets",
+      subcategories: [
+        "Cães",
+        "Gatos",
+        "Aves",
+        "Peixes",
+        "Roedores",
+        "Rações",
+        "Brinquedos para Pets",
+        "Casinhas",
+        "Serviços Veterinários",
+        "Outros"
+      ]
+    },
+    {
+      name: "Serviços",
+      subcategories: [
+        "Assistência Técnica",
+        "Serviços Automotivos",
+        "Reformas e Construção",
+        "Serviços Domésticos",
+        "Aulas Particulares",
+        "Design e Tecnologia",
+        "Marketing e Publicidade",
+        "Fretes e Mudanças",
+        "Eventos",
+        "Outros"
+      ]
+    },
+    {
+      name: "Empregos",
+      subcategories: [
+        "Tecnologia",
+        "Administrativo",
+        "Vendas",
+        "Marketing",
+        "Saúde",
+        "Educação",
+        "Construção",
+        "Serviços Gerais",
+        "Estágio",
+        "Freelancer",
+        "Outros"
+      ]
     },
     {
       name: "Outros",
-      subcategories: ["Geral", "Outros"],
-    },
+      subcategories: [
+        "Antiguidades",
+        "Colecionáveis",
+        "Livros",
+        "Revistas",
+        "Cursos",
+        "Artesanato",
+        "Produtos Personalizados",
+        "Outros"
+      ]
+    }
   ];
 
   console.log("Iniciando seed de categorias de produtos...");
