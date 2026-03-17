@@ -11,7 +11,7 @@ export async function GET() {
   }
 
   try {
-    const user = await prisma.user.findUnique({
+    const user = await (prisma as any).user.findUnique({
       where: { email: (session as any).user.email },
       include: {
         profession: {
@@ -71,7 +71,7 @@ export async function PATCH(req: Request) {
       }
     }
 
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await (prisma as any).user.update({
       where: { email: (session as any).user.email },
       data: {
         name: name || undefined,

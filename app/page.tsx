@@ -11,11 +11,11 @@ import { prisma } from "@/lib/db";
 
 export default async function Home() {
   const initialNews = await blogPostRepository.getLatest(12);
-  const session = await getServerSession(authOptions as any);
+  const session = await getServerSession(authOptions as any) as any;
   
   let showProfileCTA = false;
   if (session?.user?.email) {
-    const user = await prisma.user.findUnique({
+    const user = await (prisma as any).user.findUnique({
       where: { email: session.user.email },
       select: { professionId: true, username: true }
     });
