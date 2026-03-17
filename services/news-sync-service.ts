@@ -9,11 +9,16 @@ const COMMON_HEADERS = {
   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
   'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
+  'Cache-Control': 'no-cache',
+  'Pragma': 'no-cache',
+  'Sec-Fetch-Dest': 'document',
+  'Sec-Fetch-Mode': 'navigate',
+  'Sec-Fetch-Site': 'none',
+  'Sec-Fetch-User': '?1',
+  'Upgrade-Insecure-Requests': '1',
 };
 
 const parser = new Parser({
-  timeout: 10000,
-  headers: COMMON_HEADERS,
   customFields: {
     item: [
       ["media:content", "mediaContent", { keepArray: true }],
@@ -34,7 +39,18 @@ export class NewsSyncService {
         console.log(`[SYNC] > Blog: ${blog.nome} (ID: ${blog.id})`);
         try {
           console.log(`[SYNC]   - Baixando RSS: ${blog.rssUrl}`);
-          const feed = await parser.parseURL(blog.rssUrl);
+          
+          const response = await fetch(blog.rssUrl, {
+            headers: COMMON_HEADERS,
+            signal: AbortSignal.timeout(15000)
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+
+          const xml = await response.text();
+          const feed = await parser.parseString(xml);
           const items = feed.items || [];
           console.log(`[SYNC]   - RSS OK: ${items.length} itens`);
 
@@ -58,7 +74,9 @@ export class NewsSyncService {
 
               if (needsExtraction) {
                 try {
-                  const article = await extract(item.link);
+                  const article = await extract(item.link, {
+                    headers: COMMON_HEADERS
+                  });
                   if (article) {
                     if (!imageUrl && article.image) imageUrl = article.image;
                     if (article.title && article.title.length > titulo.length) {
