@@ -4,7 +4,7 @@ import NewsTimeline from "@/components/NewsTimeline";
 import { newsSyncService } from "@/services/news-sync-service";
 import { Analytics } from "@vercel/analytics/next"
 import Link from "next/link";
-import { AlertTriangle, ArrowRight, Briefcase, User as UserIcon, Sparkles } from "lucide-react";
+import { AlertTriangle, ArrowRight, Briefcase, User as UserIcon, Sparkles, ShoppingBag } from "lucide-react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/db";
@@ -99,6 +99,31 @@ export default async function Home() {
           </div>
           <div className="hidden sm:flex items-center gap-2 text-blue-600 font-bold text-xs uppercase tracking-tighter group-hover:gap-3 transition-all">
             Explorar <ArrowRight className="h-4 w-4" />
+          </div>
+        </div>
+      </Link>
+
+      <Link href={session ? "/compra-e-venda?create=true" : "/compra-e-venda"} className="block mb-6 group">
+        <div className="bg-orange-50 hover:bg-orange-100 p-6 rounded-[2rem] border-2 border-orange-200 shadow-sm transition-all flex items-center gap-6 overflow-hidden relative group">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/5 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110" />
+          <div className="bg-orange-500 text-white p-3 rounded-2xl shadow-lg">
+            <ShoppingBag className="h-6 w-6" />
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="bg-orange-500 text-[10px] font-black uppercase text-white px-2 py-0.5 rounded-full tracking-widest">
+                MARKETPLACE
+              </span>
+              <h3 className="text-sm font-black uppercase tracking-widest text-orange-900">
+                Desapegue e Fature
+              </h3>
+            </div>
+            <p className="text-orange-800 text-sm font-medium leading-tight">
+              Tem algo parado em casa? Crie um anúncio agora e venda para milhares de pessoas em nossa cidade!
+            </p>
+          </div>
+          <div className="hidden sm:flex items-center gap-2 text-orange-600 font-bold text-xs uppercase tracking-tighter group-hover:gap-3 transition-all">
+            {session ? "Anunciar Agora" : "Ver Marketplace"} <ArrowRight className="h-4 w-4" />
           </div>
         </div>
       </Link>

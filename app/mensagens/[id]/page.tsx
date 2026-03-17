@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   DropdownMenu,
@@ -174,7 +175,8 @@ export default function ChatRoomPage({ params }: { params: Promise<{ id: string 
     );
   }
 
-  const otherUser = conversation.senderId === ((session as any)?.user as any)?.id ? conversation.receiver : conversation.sender;
+  const currentUser = (session?.user as any);
+  const otherUser = conversation.senderId === currentUser?.id ? conversation.receiver : conversation.sender;
   const isFinished = conversation.status === "FINISHED";
 
   return (
@@ -219,7 +221,7 @@ export default function ChatRoomPage({ params }: { params: Promise<{ id: string 
               className="hidden md:flex rounded-full border-green-500/20 text-green-600 hover:bg-green-500/10 font-bold uppercase text-[10px] tracking-widest gap-2"
             >
               <CheckCircle2 className="h-3 w-3" />
-              Finalizar Orçamento
+              {conversation.adId ? "Finalizar Negociação" : "Finalizar Orçamento"}
             </Button>
           )}
           <DropdownMenu>
@@ -232,7 +234,7 @@ export default function ChatRoomPage({ params }: { params: Promise<{ id: string 
               </DropdownMenuItem>
               {!isFinished && (
                 <DropdownMenuItem onClick={handleFinishConversation} className="md:hidden rounded-lg gap-3 text-green-600">
-                  Finalizar Orçamento
+                  {conversation.adId ? "Finalizar Negociação" : "Finalizar Orçamento"}
                 </DropdownMenuItem>
               )}
               <DropdownMenuItem 
@@ -264,9 +266,34 @@ export default function ChatRoomPage({ params }: { params: Promise<{ id: string 
       {/* Área de Mensagens */}
       <ScrollArea className="flex-1 p-4 md:p-6">
         <div className="max-w-4xl mx-auto space-y-6">
+          {conversation.ad && (
+            <Card className="mb-6 overflow-hidden rounded-[1.5rem] border-2 bg-background flex items-center p-3 gap-4 shadow-sm border-primary/10">
+              <div className="h-16 w-20 rounded-xl overflow-hidden bg-muted flex-shrink-0">
+                <img 
+                  src={conversation.ad.images[0]?.url || "/placeholder-ad.jpg"} 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <Badge variant="secondary" className="text-[8px] uppercase font-black tracking-widest px-1.5 h-4 bg-primary/10 text-primary border-none">Interesse em Produto</Badge>
+                  <span className="text-[10px] font-black text-orange-600 tracking-tighter italic">
+                    {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(parseFloat(conversation.ad.price))}
+                  </span>
+                </div>
+                <h3 className="font-bold text-sm truncate uppercase tracking-tighter">{conversation.ad.title}</h3>
+              </div>
+              <Button size="sm" variant="ghost" className="rounded-xl text-[10px] font-bold uppercase tracking-widest px-3 h-8" asChild>
+                <Link href={`/compra-e-venda/${conversation.ad.id}`}>Ver Anúncio</Link>
+              </Button>
+            </Card>
+          )}
+
           <div className="text-center space-y-2 py-8">
             <Badge variant="outline" className="rounded-full font-mono text-[9px]">CONVERSA INICIADA EM {new Date(conversation.createdAt).toLocaleDateString("pt-BR")}</Badge>
-            <p className="text-[10px] uppercase font-black tracking-widest text-muted-foreground/50">Esta é uma conversa privada sobre um orçamento.</p>
+            <p className="text-[10px] uppercase font-black tracking-widest text-muted-foreground/50">
+              {conversation.adId ? "Esta é uma negociação de produto." : "Esta é uma conversa privada sobre um orçamento."}
+            </p>
           </div>
 
           <div className="space-y-4">

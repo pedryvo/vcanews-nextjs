@@ -6,24 +6,24 @@ import { pusherServer } from "@/lib/pusher";
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions as any);
-    if (!(session as any)?.user) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { receiverId } = await req.json();
-    const senderId = (session as any).user.id;
+    const { receiverId, adId } = await req.json();
+    const senderId = (session?.user as any)?.id;
 
     if (senderId === receiverId) {
       return NextResponse.json({ error: "Você não pode pedir um orçamento para si mesmo" }, { status: 400 });
     }
 
     // Verificar se já existe uma conversa ABERTA entre esses dois usuários
-    const existingConversation = await prisma.budgetConversation.findFirst({
+    const existingConversation = await (prisma as any).budgetConversation.findFirst({
       where: {
         OR: [
-          { senderId, receiverId, status: "OPEN" },
-          { senderId: receiverId, receiverId: senderId, status: "OPEN" },
+          { senderId, receiverId, adId: adId || null, status: "OPEN" },
+          { senderId: receiverId, receiverId: senderId, adId: adId || null, status: "OPEN" },
         ],
       },
     });
@@ -42,10 +42,11 @@ export async function POST(req: Request) {
     }
 
     // Criar nova conversa
-    const conversation = await prisma.budgetConversation.create({
+    const conversation = await (prisma as any).budgetConversation.create({
       data: {
         senderId,
         receiverId,
+        adId: adId || null,
         status: "OPEN",
       },
     });
@@ -54,16 +55,16 @@ export async function POST(req: Request) {
     await prisma.notification.create({
       data: {
         userId: receiverId,
-        type: "BUDGET_MESSAGE", // Usando o tipo existente que aponta para mensagens/id
+        type: (adId ? "MARKETPLACE_MESSAGE" : "BUDGET_MESSAGE") as any, 
         referenceId: conversation.id,
       }
     });
 
     // Notificar o destinatário via Pusher
     await pusherServer.trigger(`user-${receiverId}`, "notification", {
-      type: "NEW_BUDGET",
+      type: adId ? "NEW_MARKETPLACE" : "NEW_BUDGET",
       referenceId: conversation.id,
-      message: "Novo pedido de orçamento recebido!"
+      message: adId ? "Interesse em seu produto recebido!" : "Novo pedido de orçamento recebido!"
     });
 
     return NextResponse.json(conversation);
@@ -75,20 +76,25 @@ export async function POST(req: Request) {
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions as any);
-    if (!(session as any)?.user) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userId = (session as any).user.id;
+    const userId = (session?.user as any)?.id;
 
-    const conversations = await prisma.budgetConversation.findMany({
+    const conversations = await (prisma as any).budgetConversation.findMany({
       where: {
         OR: [{ senderId: userId }, { receiverId: userId }],
       },
       include: {
         sender: { select: { id: true, name: true, image: true, username: true } },
         receiver: { select: { id: true, name: true, image: true, username: true } },
+        ad: {
+          include: {
+            images: { take: 1 }
+          }
+        },
         messages: {
           orderBy: { createdAt: "desc" },
           take: 1,

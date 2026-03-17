@@ -7,19 +7,15 @@ import { pusherServer } from "@/lib/pusher";
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const session = await getServerSession(authOptions as any);
-    if (!(session as any)?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const session = await getServerSession(authOptions);
+    if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { content } = await req.json();
-    const userId = (session as any).user.id;
+    const userId = (session?.user as any)?.id;
 
     // Verificar se a conversa existe e se o usuário faz parte dela
-    const conversation = await prisma.budgetConversation.findUnique({
+    const conversation = await (prisma as any).budgetConversation.findUnique({
       where: { id },
-      include: {
-        sender: true,
-        receiver: true,
-      },
     });
 
     if (!conversation) return NextResponse.json({ error: "Conversa não encontrada" }, { status: 404 });
@@ -40,17 +36,19 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     });
 
     // Atualizar lastMessageAt na conversa
-    await prisma.budgetConversation.update({
+    await (prisma as any).budgetConversation.update({
       where: { id },
       data: { lastMessageAt: new Date() },
     });
 
     // Criar notificação para o outro usuário
     const otherUserId = conversation.senderId === userId ? conversation.receiverId : conversation.senderId;
+    const notificationType = (conversation.adId ? "MARKETPLACE_MESSAGE" : "BUDGET_MESSAGE") as any;
+    
     await prisma.notification.create({
       data: {
         userId: otherUserId,
-        type: "BUDGET_MESSAGE",
+        type: notificationType,
         referenceId: id,
       },
     });
@@ -61,9 +59,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     
     // Para o sino (ponto vermelho)
     await pusherServer.trigger(`user-${otherUserId}`, "notification", {
-      type: "BUDGET_MESSAGE",
+      type: conversation.adId ? "MARKETPLACE_MESSAGE" : "BUDGET_MESSAGE",
       referenceId: id,
-      message: "Nova mensagem no chat de orçamento"
+      message: conversation.adId ? "Nova mensagem na negociação do produto" : "Nova mensagem no chat de orçamento"
     });
 
     return NextResponse.json(message);
@@ -76,19 +74,26 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const session = await getServerSession(authOptions as any);
-    if (!(session as any)?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const session = await getServerSession(authOptions);
+    if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const userId = (session as any).user.id;
+    const userId = (session?.user as any)?.id;
 
-    const conversation = await prisma.budgetConversation.findUnique({
+    const conversation = await (prisma as any).budgetConversation.findUnique({
       where: { id },
       include: {
-        messages: { orderBy: { createdAt: "asc" } },
-        sender: { select: { id: true, name: true, image: true, username: true } },
-        receiver: { select: { id: true, name: true, image: true, username: true } },
-      },
-    });
+            messages: {
+              orderBy: { createdAt: "asc" },
+            },
+            sender: { select: { id: true, name: true, image: true, username: true } },
+            receiver: { select: { id: true, name: true, image: true, username: true } },
+            ad: {
+              include: {
+                images: { take: 1 }
+              }
+            },
+          },
+        });
 
     if (!conversation) return NextResponse.json({ error: "Conversa não encontrada" }, { status: 404 });
     if (conversation.senderId !== userId && conversation.receiverId !== userId) {
@@ -104,13 +109,13 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const session = await getServerSession(authOptions as any);
-    if (!(session as any)?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const session = await getServerSession(authOptions);
+    if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const userId = (session as any).user.id;
+    const userId = (session?.user as any)?.id;
     const { status } = await req.json();
 
-    const conversation = await prisma.budgetConversation.findUnique({
+    const conversation = await (prisma as any).budgetConversation.findUnique({
       where: { id },
     });
 
@@ -119,7 +124,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
     }
 
-    const updated = await prisma.budgetConversation.update({
+    const updated = await (prisma as any).budgetConversation.update({
       where: { id },
       data: { status },
     });

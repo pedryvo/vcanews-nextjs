@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Bell, MessageSquare, AlertTriangle, ArrowRight } from "lucide-react";
+import { Bell, MessageSquare, AlertTriangle, ArrowRight, ShoppingBag } from "lucide-react";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -112,7 +112,7 @@ export function NotificationMenu() {
                     {/* Stripe vertical lateral */}
                     <div className={cn(
                       "w-1.5 shrink-0",
-                      n.type === "COMMENT" ? "bg-amber-400" : "bg-primary",
+                      n.type === "COMMENT" ? "bg-amber-400" : n.type === "MARKETPLACE_MESSAGE" ? "bg-orange-500" : "bg-primary",
                       n.status === "FINISHED" && "bg-muted-foreground"
                     )} />
                     
@@ -140,12 +140,12 @@ export function NotificationMenu() {
                         <div className="flex items-center gap-1.5 opacity-60">
                           <div className={cn(
                             "p-1 rounded-md shrink-0",
-                            n.type === "COMMENT" ? "bg-amber-400/10 text-amber-600" : "bg-primary/10 text-primary"
+                            n.type === "COMMENT" ? "bg-amber-400/10 text-amber-600" : n.type === "MARKETPLACE_MESSAGE" ? "bg-orange-500/10 text-orange-600" : "bg-primary/10 text-primary"
                           )}>
-                            {n.type === "COMMENT" ? <AlertTriangle className="h-2.5 w-2.5" /> : <MessageSquare className="h-2.5 w-2.5" />}
+                            {n.type === "COMMENT" ? <AlertTriangle className="h-2.5 w-2.5" /> : n.type === "MARKETPLACE_MESSAGE" ? <ShoppingBag className="h-2.5 w-2.5" /> : <MessageSquare className="h-2.5 w-2.5" />}
                           </div>
                           <p className="text-[10px] font-bold truncate">
-                            {n.type === "COMMENT" ? "Comentou na denúncia" : "Mensagem no chat"}
+                            {n.type === "COMMENT" ? "Comentou na denúncia" : n.type === "MARKETPLACE_MESSAGE" ? "Interesse em produto" : "Mensagem no chat"}
                           </p>
                         </div>
                       </div>

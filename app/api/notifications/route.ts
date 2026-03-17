@@ -24,7 +24,7 @@ export async function GET() {
     const processedGroups = new Set();
 
     for (const n of notifications) {
-      if (n.type === "BUDGET_MESSAGE" || n.type === "NEW_BUDGET") {
+      if (n.type === "BUDGET_MESSAGE" || n.type === "NEW_BUDGET" || n.type === "MARKETPLACE_MESSAGE") {
         if (processedGroups.has(n.referenceId)) continue;
         processedGroups.add(n.referenceId);
 

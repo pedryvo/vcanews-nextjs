@@ -34,6 +34,11 @@ export default function Navbar() {
       className: "bg-blue-600 hover:bg-blue-700 text-white border-blue-800",
     },
     {
+      href: "/compra-e-venda",
+      label: "COMPRA E VENDA",
+      className: "bg-orange-500 hover:bg-orange-600 text-white border-orange-700",
+    },
+    {
       href: "/contato",
       label: "FALE CONOSCO",
       className: "bg-emerald-500 hover:bg-emerald-600 text-white border-emerald-700",

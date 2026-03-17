@@ -25,6 +25,16 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { AdCard } from "@/components/Shop/AdCard";
+import { AdForm } from "@/components/Shop/AdForm";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Plus, ShoppingBag } from "lucide-react";
 
 interface PublicProfileProps {
   params: Promise<{ username: string }>;
@@ -40,6 +50,11 @@ export default function PublicProfilePage({ params }: PublicProfileProps) {
   const [activeSlide, setActiveSlide] = useState(0);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [userAds, setUserAds] = useState<any[]>([]);
+  const [adFormOpen, setAdFormOpen] = useState(false);
+  const [loadingAds, setLoadingAds] = useState(false);
+  const [adPage, setAdPage] = useState(1);
+  const [adPagination, setAdPagination] = useState<any>(null);
 
   useEffect(() => {
     async function fetchPublicProfile() {
@@ -57,6 +72,32 @@ export default function PublicProfilePage({ params }: PublicProfileProps) {
     }
     fetchPublicProfile();
   }, [resolvedParams.username]);
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchUserAds();
+    }
+  }, [user?.id, adPage]);
+
+  const fetchUserAds = async () => {
+    setLoadingAds(true);
+    try {
+      const res = await fetch(`/api/marketplace?userId=${user.id}&page=${adPage}&limit=6`);
+      if (res.ok) {
+        const data = await res.json();
+        setUserAds(data.ads);
+        setAdPagination(data.pagination);
+      }
+    } catch (error) {
+      console.error("Failed to fetch user ads");
+    } finally {
+      setLoadingAds(false);
+    }
+  };
+
+  const handleAdPageChange = (newPage: number) => {
+    setAdPage(newPage);
+  };
 
   const handleStartBudget = async () => {
     if (!session) {
@@ -155,7 +196,7 @@ export default function PublicProfilePage({ params }: PublicProfileProps) {
     );
   }
 
-  const isOwnProfile = (session as any)?.user?.id === user.id;
+  const isOwnProfile = (session?.user as any)?.id === user.id;
 
   return (
     <div className="min-h-screen bg-muted/30 pb-20">
@@ -344,6 +385,109 @@ export default function PublicProfilePage({ params }: PublicProfileProps) {
                 </CardContent>
               </Card>
             )}
+
+            {/* Minha Lojinha Section */}
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-3xl font-black uppercase tracking-tighter italic">Minha Lojinha</h2>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Produtos anunciados pelo profissional</p>
+                </div>
+                
+                {isOwnProfile && (
+                  <Dialog open={adFormOpen} onOpenChange={setAdFormOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="rounded-2xl h-10 px-4 font-bold uppercase tracking-wider shadow-lg shadow-primary/20 gap-2">
+                        <Plus className="h-4 w-4" />
+                        Criar Anúncio
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[500px] rounded-[2rem] border-2 p-8 overflow-y-auto max-h-[90vh]">
+                      <DialogHeader className="mb-6">
+                        <DialogTitle className="text-2xl font-black uppercase tracking-tighter italic text-center">Novo Anúncio</DialogTitle>
+                      </DialogHeader>
+                      <AdForm 
+                        onSuccess={() => {
+                          setAdFormOpen(false);
+                          fetchUserAds();
+                        }} 
+                        onCancel={() => setAdFormOpen(false)} 
+                      />
+                    </DialogContent>
+                  </Dialog>
+                )}
+              </div>
+
+              {loadingAds ? (
+                <div className="flex py-12 justify-center">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary opacity-20" />
+                </div>
+              ) : userAds.length > 0 ? (
+                <div className="space-y-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {userAds.map((ad) => (
+                      <AdCard key={ad.id} ad={ad} />
+                    ))}
+                  </div>
+
+                  {adPagination && adPagination.pages > 1 && (
+                    <div className="flex items-center justify-center gap-2 pt-4">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-10 w-10 rounded-xl"
+                        disabled={adPage === 1}
+                        onClick={() => handleAdPageChange(adPage - 1)}
+                      >
+                        <ChevronLeft className="h-5 w-5" />
+                      </Button>
+                      
+                      <div className="flex items-center gap-1.5">
+                        {Array.from({ length: adPagination.pages }, (_, i) => i + 1).map((p) => (
+                          <Button
+                            key={p}
+                            variant={adPage === p ? "default" : "ghost"}
+                            size="icon"
+                            className={cn(
+                              "h-10 w-10 rounded-xl font-bold uppercase text-[10px]",
+                              adPage === p ? "shadow-lg shadow-primary/20" : "text-muted-foreground"
+                            )}
+                            onClick={() => handleAdPageChange(p)}
+                          >
+                            {p}
+                          </Button>
+                        ))}
+                      </div>
+
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-10 w-10 rounded-xl"
+                        disabled={adPage === adPagination.pages}
+                        onClick={() => handleAdPageChange(adPage + 1)}
+                      >
+                        <ChevronRight className="h-5 w-5" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="bg-background rounded-[2rem] border-2 border-dashed border-muted p-12 text-center space-y-4">
+                  <div className="h-16 w-16 bg-muted rounded-full flex items-center justify-center mx-auto">
+                    <ShoppingBag className="h-8 w-8 text-muted-foreground opacity-20" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Lojinha Vazia</p>
+                    <p className="text-[10px] text-muted-foreground/60 max-w-[200px] mx-auto uppercase font-medium">Nenhum produto anunciado no momento.</p>
+                  </div>
+                  {isOwnProfile && (
+                    <Button variant="outline" onClick={() => setAdFormOpen(true)} className="rounded-xl font-bold uppercase tracking-tight">
+                      Começar a Vender
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

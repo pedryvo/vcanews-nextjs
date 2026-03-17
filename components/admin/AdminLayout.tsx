@@ -8,7 +8,8 @@ import {
   AlertTriangle,
   MessageSquare,
   Users,
-  Mail
+  Mail,
+  ShoppingBag
 } from "lucide-react";
 
 import { SyncButton } from "./SyncButton";
@@ -26,6 +27,7 @@ export default function AdminLayout({
     { name: "Denúncias", href: "/admin/denuncias", icon: AlertTriangle },
     { name: "Comentários", href: "/admin/comments", icon: MessageSquare },
     { name: "Mensagens", href: "/admin/messages", icon: Mail },
+    { name: "Marketplace", href: "/admin/marketplace", icon: ShoppingBag },
     { name: "Usuários", href: "/admin/users", icon: Users },
   ];
 

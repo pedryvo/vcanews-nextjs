@@ -172,6 +172,62 @@ async function main() {
     },
   ];
 
+  const productCategories = [
+    {
+      name: "Eletrônicos & Celulares",
+      subcategories: ["Celulares e Smartphones", "Tablets e iPads", "Computadores e Notebooks", "Consoles e Games", "TVs e Áudio", "Câmeras e Drones", "Outros"],
+    },
+    {
+      name: "Veículos & Acessórios",
+      subcategories: ["Carros e Sedans", "SUVs e Caminhonetes", "Motos e Scooters", "Peças e Acessórios", "Náutica", "Outros"],
+    },
+    {
+      name: "Imóveis",
+      subcategories: ["Apartamentos", "Casas", "Terrenos e Lotes", "Sítios e Fazendas", "Temporada", "Outros"],
+    },
+    {
+      name: "Moda & Beleza",
+      subcategories: ["Roupas Femininas", "Roupas Masculinas", "Calçados", "Relógios e Joias", "Beleza e Maquiagem", "Outros"],
+    },
+    {
+      name: "Casa & Eletrodomésticos",
+      subcategories: ["Móveis", "Decoração", "Geladeiras e Freezers", "Fogões e Fornos", "Ar Condicionado", "Outros"],
+    },
+    {
+      name: "Esportes & Lazer",
+      subcategories: ["Bicicletas", "Fitness e Musculação", "Camping e Pesca", "Instrumentos Musicais", "Outros"],
+    },
+    {
+      name: "Companhia & Pets",
+      subcategories: ["Cães e Gatos", "Acessórios e Ração", "Serviços Pet", "Outros"],
+    },
+    {
+      name: "Outros",
+      subcategories: ["Geral", "Outros"],
+    },
+  ];
+
+  console.log("Iniciando seed de categorias de produtos...");
+
+  for (const prodCat of productCategories) {
+    const category = await (prisma as any).adCategory.upsert({
+      where: { name: prodCat.name },
+      update: {},
+      create: { name: prodCat.name },
+    });
+
+    for (const subName of prodCat.subcategories) {
+      await (prisma as any).adSubcategory.upsert({
+        where: { name_categoryId: { name: subName, categoryId: category.id } },
+        update: {},
+        create: {
+          name: subName,
+          categoryId: category.id,
+        },
+      });
+    }
+  }
+
   console.log("Iniciando seed de categorias e profissões...");
 
   for (const cat of categories) {
