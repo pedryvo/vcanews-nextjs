@@ -14,72 +14,69 @@ const parser = new Parser({
 
 export class NewsSyncService {
   async sync() {
-    const blogs = await blogRepository.getAll();
-    console.log(`[SYNC] Iniciando sincronização. Blogs encontrados no banco: ${blogs.length}`);
+    console.info("============== [START SYNC] ==============");
+    try {
+      const blogs = await blogRepository.getAll();
+      console.info(`[SYNC] Blogs para processar: ${blogs.length}`);
 
-    for (const blog of blogs) {
-      try {
-        console.log(`[SYNC] Processando blog: ${blog.nome} (${blog.rssUrl})`);
-        const feed = await parser.parseURL(blog.rssUrl);
-        console.log(`[SYNC] RSS processado. Items encontrados: ${feed.items?.length || 0}`);
+      for (const blog of blogs) {
+        console.info(`[SYNC] > Iniciando Blog: ${blog.nome}`);
+        try {
+          const feed = await parser.parseURL(blog.rssUrl);
+          console.info(`[SYNC] RSS OK: ${feed.items?.length || 0} items encontrados`);
 
-        for (const item of feed.items) {
-          if (!item.link || !item.title) continue;
+          let countNew = 0;
+          for (const item of feed.items) {
+            if (!item.link || !item.title) continue;
 
-          // OTIMIZAÇÃO: Se já existe, pula o processamento pesado
-          const exists = await blogPostRepository.existsByUrl(item.link);
-          if (exists) {
-            continue;
-          }
+            const exists = await blogPostRepository.existsByUrl(item.link);
+            if (exists) continue;
 
-          console.log(`[SYNC] Novo post encontrado: ${item.title}`);
+            countNew++;
+            console.info(`[SYNC]   + Novo post: ${item.title.substring(0, 50)}...`);
 
-          let imageUrl = this.extractImageUrlFromRSS(item);
-          let titulo = item.title;
+            let imageUrl = this.extractImageUrlFromRSS(item);
+            let titulo = item.title;
 
-          // OTIMIZAÇÃO: Só chama o extrator pesado se realmente precisar (falta imagem ou título curto)
-          const needsExtraction = !imageUrl || (titulo && titulo.length < 50);
+            const needsExtraction = !imageUrl || (titulo && titulo.length < 50);
 
-          if (needsExtraction) {
-            try {
-              const article = await extract(item.link);
-              if (article) {
-                if (!imageUrl && article.image) {
-                  console.log(`[SYNC] Imagem extraída via article-extractor para: ${item.title}`);
-                  imageUrl = article.image;
+            if (needsExtraction) {
+              try {
+                const article = await extract(item.link);
+                if (article) {
+                  if (!imageUrl && article.image) imageUrl = article.image;
+                  if (article.title && article.title.length > titulo.length) {
+                    titulo = article.title;
+                  }
                 }
-                if (article.title && article.title.length > titulo.length) {
-                  // console.log(`Título aprimorado: ${article.title}`);
-                  titulo = article.title;
-                }
+              } catch (e) {
+                console.warn(`[SYNC]   ! Erro extração extra (${item.link})`);
               }
-            } catch (e) {
-              console.error(`[SYNC] Erro ao extrair metadados extras de ${item.link}:`, e);
             }
+
+            const publishDate = item.pubDate ? new Date(item.pubDate) : new Date();
+
+            await blogPostRepository.upsert({
+              where: { url: item.link },
+              update: { titulo, imageUrl, dataPublicacao: publishDate },
+              create: {
+                titulo,
+                url: item.link,
+                imageUrl,
+                dataPublicacao: publishDate,
+                blogId: blog.id,
+              },
+            });
           }
-
-          const publishDate = item.pubDate ? new Date(item.pubDate) : new Date();
-
-          await blogPostRepository.upsert({
-            where: { url: item.link },
-            update: {
-              titulo: titulo,
-              imageUrl: imageUrl,
-              dataPublicacao: publishDate,
-            },
-            create: {
-              titulo: titulo,
-              url: item.link,
-              imageUrl: imageUrl,
-              dataPublicacao: publishDate,
-              blogId: blog.id,
-            },
-          });
+          console.info(`[SYNC] > Finalizado Blog: ${blog.nome} (${countNew} novos)`);
+        } catch (blogError) {
+          console.error(`[SYNC] !!! ERRO NO BLOG ${blog.nome}:`, blogError);
         }
-      } catch (error) {
-        console.error(`Erro ao processar blog ${blog.nome}:`, error);
       }
+    } catch (globalError) {
+      console.error("[SYNC] !!! ERRO GLOBAL NO SYNC:", globalError);
     }
+    console.info("============== [END SYNC] ==============");
   }
 
   private extractImageUrlFromRSS(item: any): string | null {
