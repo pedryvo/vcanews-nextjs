@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Mail, Send, CheckCircle2, AlertCircle, Info, Target, Heart } from "lucide-react";
 import { toast } from "sonner";
 import { Turnstile } from "@marsidev/react-turnstile";
@@ -14,6 +14,7 @@ export default function ContatoPage() {
     message: "",
   });
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<any>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,6 +31,8 @@ export default function ContatoPage() {
 
       toast.success("Mensagem enviada com sucesso! Entraremos em contato em breve.");
       setFormData({ name: "", email: "", subject: "", message: "" });
+      setCaptchaToken(null);
+      captchaRef.current?.reset();
     } catch (error) {
       toast.error("Erro ao enviar mensagem. Tente novamente.");
     } finally {
@@ -149,6 +152,7 @@ export default function ContatoPage() {
 
             <div className="flex justify-center py-2">
               <Turnstile
+                ref={captchaRef}
                 siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
                 onSuccess={(token) => setCaptchaToken(token)}
                 onError={() => setCaptchaToken(null)}
