@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ThumbsUp, ThumbsDown, ChevronDown, ChevronUp } from "lucide-react";
+import { ThumbsUp, ThumbsDown, ChevronDown, ChevronUp, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { CommentSection } from "@/components/CommentSection";
 
 type User = { id: string; name: string | null; image: string | null };
 type Reaction = { id: string; type: string; user: User };
@@ -27,7 +28,22 @@ export function DenunciaCard({ denuncia, currentUserId }: DenunciaCardProps) {
   const [mounted, setMounted] = useState(false);
   const [reactions, setReactions] = useState<Reaction[]>(denuncia.reactions);
   const [showReactions, setShowReactions] = useState(false);
+  const [showComments, setShowComments] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [commentCount, setCommentCount] = useState(0);
+
+  useEffect(() => {
+    async function fetchCommentCount() {
+      try {
+        const res = await fetch(`/api/denuncias/${denuncia.id}/comments`);
+        if (res.ok) {
+          const data = await res.json();
+          setCommentCount(data.length);
+        }
+      } catch (e) {}
+    }
+    fetchCommentCount();
+  }, [denuncia.id]);
 
   useEffect(() => {
     setMounted(true);
@@ -140,6 +156,17 @@ export function DenunciaCard({ denuncia, currentUserId }: DenunciaCardProps) {
             <span>{unlikes.length}</span>
           </Button>
 
+          <Button
+            size="sm"
+            variant={showComments ? "secondary" : "outline"}
+            className="gap-1.5 h-8 font-bold"
+            onClick={() => setShowComments((v) => !v)}
+          >
+            <MessageCircle className="h-3.5 w-3.5" />
+            <span>{commentCount}</span>
+            <span className="hidden sm:inline">Comentários</span>
+          </Button>
+
           {reactions.length > 0 && (
             <Button
               size="sm"
@@ -172,6 +199,8 @@ export function DenunciaCard({ denuncia, currentUserId }: DenunciaCardProps) {
             </div>
           </div>
         )}
+
+        {showComments && <CommentSection denunciaId={denuncia.id} />}
       </CardContent>
     </Card>
   );

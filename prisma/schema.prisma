@@ -73,6 +73,7 @@ model User {
   sessions      Session[]
   denuncias     Denuncia[]
   reactions     Reaction[]
+  comments      Comment[]
 }
 
 model Denuncia {
@@ -86,6 +87,7 @@ model Denuncia {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   reactions Reaction[]
+  comments  Comment[]
 }
 
 model Reaction {
@@ -98,6 +100,17 @@ model Reaction {
   createdAt  DateTime @default(now())
 
   @@unique([userId, denunciaId])
+}
+
+model Comment {
+  id         String   @id @default(cuid())
+  text       String
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  denunciaId String
+  denuncia   Denuncia @relation(fields: [denunciaId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model VerificationToken {

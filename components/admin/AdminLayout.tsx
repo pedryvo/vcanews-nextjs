@@ -5,7 +5,8 @@ import {
   Newspaper, 
   LayoutDashboard,
   ChevronRight,
-  AlertTriangle
+  AlertTriangle,
+  MessageSquare
 } from "lucide-react";
 
 import { SyncButton } from "./SyncButton";
@@ -21,6 +22,7 @@ export default function AdminLayout({
     { name: "Blogs", href: "/admin/blogs", icon: Rss },
     { name: "Notícias", href: "/admin/posts", icon: Newspaper },
     { name: "Denúncias", href: "/admin/denuncias", icon: AlertTriangle },
+    { name: "Comentários", href: "/admin/comments", icon: MessageSquare },
   ];
 
   return (
