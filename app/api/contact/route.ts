@@ -11,13 +11,13 @@ export async function POST(req: Request) {
     }
 
     // Verificar Turnstile
+    // Verificar Turnstile via API Siteverify
     const verifyRes = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        secret: process.env.TURNSTILE_SECRET_KEY,
-        response: captchaToken,
-      }),
+      body: `secret=${encodeURIComponent(process.env.TURNSTILE_SECRET_KEY!)}&response=${encodeURIComponent(captchaToken)}`,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
     });
 
     const verifyData = await verifyRes.json();

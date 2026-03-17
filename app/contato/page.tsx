@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Mail, Send, CheckCircle2, AlertCircle, Info, Target, Heart } from "lucide-react";
 import { toast } from "sonner";
-import Turnstile from "react-turnstile";
+import { Turnstile } from "@marsidev/react-turnstile";
 
 export default function ContatoPage() {
   const [loading, setLoading] = useState(false);
@@ -149,8 +149,10 @@ export default function ContatoPage() {
 
             <div className="flex justify-center py-2">
               <Turnstile
-                sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
-                onVerify={(token) => setCaptchaToken(token)}
+                siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+                onSuccess={(token) => setCaptchaToken(token)}
+                onError={() => setCaptchaToken(null)}
+                onExpire={() => setCaptchaToken(null)}
               />
             </div>
 
