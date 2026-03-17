@@ -3,7 +3,7 @@ import { Metadata } from "next";
 import PublicProfileClient from "@/components/User/PublicProfileClient";
 import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 
 interface Props {
   params: Promise<{ username: string }>;

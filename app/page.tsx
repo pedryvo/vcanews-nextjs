@@ -7,7 +7,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import Link from "next/link";
 import { AlertTriangle, ArrowRight, Briefcase, User as UserIcon, Sparkles, ShoppingBag } from "lucide-react";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
 export default async function Home() {
