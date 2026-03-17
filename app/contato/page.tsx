@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Mail, Send, CheckCircle2, AlertCircle, Info, Target, Heart } from "lucide-react";
 import { toast } from "sonner";
+import Turnstile from "react-turnstile";
 
 export default function ContatoPage() {
   const [loading, setLoading] = useState(false);
@@ -12,6 +13,7 @@ export default function ContatoPage() {
     subject: "",
     message: "",
   });
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,7 +23,7 @@ export default function ContatoPage() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, captchaToken }),
       });
 
       if (!res.ok) throw new Error("Falha ao enviar mensagem");
@@ -145,8 +147,15 @@ export default function ContatoPage() {
               />
             </div>
 
+            <div className="flex justify-center py-2">
+              <Turnstile
+                sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+                onVerify={(token) => setCaptchaToken(token)}
+              />
+            </div>
+
             <button
-              disabled={loading}
+              disabled={loading || !captchaToken}
               type="submit"
               className="w-full h-16 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-blue-200 transition-all flex items-center justify-center gap-3 transform active:scale-[0.98]"
             >

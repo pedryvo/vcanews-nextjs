@@ -4,7 +4,26 @@ import { prisma } from "@/lib/db";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { name, email, subject, message } = body;
+    const { name, email, subject, message, captchaToken } = body;
+
+    if (!captchaToken) {
+      return NextResponse.json({ error: "CAPTCHA obrigatório." }, { status: 400 });
+    }
+
+    // Verificar Turnstile
+    const verifyRes = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        secret: process.env.TURNSTILE_SECRET_KEY,
+        response: captchaToken,
+      }),
+    });
+
+    const verifyData = await verifyRes.json();
+    if (!verifyData.success) {
+      return NextResponse.json({ error: "Falha na verificação do CAPTCHA." }, { status: 400 });
+    }
 
     if (!name || !email || !subject || !message) {
       return NextResponse.json(
