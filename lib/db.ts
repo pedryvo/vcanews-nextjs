@@ -18,7 +18,7 @@ if (!connectionString) {
 
 const pool = new Pool({
   connectionString,
-  max: 1,
+  max: 10,
   connectionTimeoutMillis: 15000, // Aumentado para 15s (Neon cold start)
   ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
   idleTimeoutMillis: 30000,

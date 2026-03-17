@@ -54,11 +54,14 @@ export const authOptions: NextAuthOptions = {
         token.role = user.role || "USER";
         token.username = (user as any).username;
         token.isBlocked = (user as any).isBlocked;
+        token.name = user.name;
+        token.picture = user.image;
+        token.birthDate = (user as any).birthDate;
       }
 
-      if (trigger === "update" || user) {
+      if (trigger === "update") {
         const updatedUser = await prisma.user.findUnique({
-          where: { id: user?.id || token.id }
+          where: { id: token.id }
         });
         if (updatedUser) {
           token.username = updatedUser.username;
@@ -66,6 +69,7 @@ export const authOptions: NextAuthOptions = {
           token.picture = updatedUser.image;
           token.birthDate = updatedUser.birthDate;
           token.isBlocked = updatedUser.isBlocked;
+          token.role = updatedUser.role || "USER";
         }
       }
 

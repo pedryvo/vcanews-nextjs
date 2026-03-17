@@ -12,8 +12,8 @@ export default function SignInPage() {
 
   const handleSignIn = async () => {
     setIsLoading(true);
-    // Garantir que o diálogo apareça antes do redirect começar
-    await new Promise(resolve => setTimeout(resolve, 800));
+    // Pequeno delay para garantir que o feedback visual seja percebido
+    await new Promise(resolve => setTimeout(resolve, 300));
     try {
       await signIn("google", { callbackUrl: "/" });
     } catch (error) {
