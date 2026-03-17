@@ -56,10 +56,10 @@ export default function DenunciasPage() {
           <Button 
             onClick={() => signIn("google")}
             size="lg"
-            className="w-full py-8 text-lg font-black tracking-widest bg-yellow-400 hover:bg-yellow-500 text-black border-b-8 border-yellow-600 active:border-b-0 active:translate-y-2 transition-all rounded-3xl gap-4 shadow-2xl"
+            className="w-full py-6 md:py-8 text-sm md:text-lg font-black tracking-widest bg-yellow-400 hover:bg-yellow-500 text-black border-b-4 md:border-b-8 border-yellow-600 active:border-b-0 active:translate-y-2 transition-all rounded-2xl md:rounded-3xl gap-2 md:gap-4 shadow-2xl"
           >
-            <LogIn className="h-8 w-8" />
-            FAÇA LOGIN PARA ENVIAR UMA DENÚNCIA
+            <LogIn className="h-6 w-6 md:h-8 md:w-8" />
+            FAÇA LOGIN PARA ENVIAR DENÚNCIA
           </Button>
         </div>
       )}
