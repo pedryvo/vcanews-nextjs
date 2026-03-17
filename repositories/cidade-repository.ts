@@ -2,10 +2,16 @@ import { prisma } from "@/lib/db";
 import { Prisma } from "@prisma/client";
 
 export class CidadeRepository {
-  async getAll() {
+  async getAll(skip?: number, take?: number) {
     return prisma.cidade.findMany({
+      skip,
+      take,
       orderBy: { nome: "asc" },
     });
+  }
+
+  async count() {
+    return prisma.cidade.count();
   }
 
   async getById(id: number) {

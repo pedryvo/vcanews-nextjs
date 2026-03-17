@@ -34,7 +34,7 @@ export const commentRepository = {
     });
   },
 
-  async getAll() {
+  async getAll(skip?: number, take?: number) {
     return prisma.comment.findMany({
       include: {
         user: {
@@ -54,7 +54,13 @@ export const commentRepository = {
       orderBy: {
         createdAt: "desc",
       },
+      skip,
+      take,
     });
+  },
+
+  async count() {
+    return prisma.comment.count();
   },
 
   async delete(id: string) {

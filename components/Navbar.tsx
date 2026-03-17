@@ -1,30 +1,44 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Button } from "@/components/ui/button"
+import { Menu, X, Mail } from "lucide-react"
 import { UserNav } from "@/components/UserNav"
 import { NotificationMenu } from "@/components/NotificationMenu"
 
 export default function Navbar() {
   const pathname = usePathname();
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleHomeClick = (e: React.MouseEvent) => {
     if (pathname === "/") {
       e.preventDefault();
-      
-      // 1. Limpar a lista
       window.dispatchEvent(new CustomEvent("clear-news"));
-      
-      // 2. Ir para o topo
       window.scrollTo({ top: 0, behavior: "smooth" });
-      
-      // 3. Recarregar as notícias (reload da página)
       setTimeout(() => {
         window.location.reload();
       }, 300);
     }
   };
+
+  const navLinks = [
+    {
+      href: "/denuncias",
+      label: "DENÚNCIAS DA CIDADE",
+      className: "bg-yellow-400 hover:bg-yellow-500 text-black border-yellow-600",
+    },
+    {
+      href: "/profissionais",
+      label: "PROFISSIONAIS DE VCA",
+      className: "bg-blue-600 hover:bg-blue-700 text-white border-blue-800",
+    },
+    {
+      href: "/contato",
+      label: "FALE CONOSCO",
+      className: "bg-emerald-500 hover:bg-emerald-600 text-white border-emerald-700",
+    },
+  ];
 
   return (
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
@@ -36,27 +50,58 @@ export default function Navbar() {
               VCANews
             </span>
           </Link>
-          <div className="hidden md:flex gap-6 items-center">
-            <Link
-              href="/denuncias"
-              className="text-xs font-black px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-black rounded-md transition-all uppercase tracking-tight shadow-lg border-b-4 border-yellow-600 active:border-b-0 active:translate-y-0.5"
-            >
-              DENÚNCIAS DA CIDADE
-            </Link>
-            <Link
-              href="/profissionais"
-              className="text-xs font-black px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-all uppercase tracking-tight shadow-lg border-b-4 border-blue-800 active:border-b-0 active:translate-y-0.5"
-            >
-              PROFISSIONAIS DE VCA
-            </Link>
+
+          {/* Desktop Nav */}
+          <div className="hidden md:flex gap-4 items-center">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`text-[10px] font-black px-4 py-2 rounded-md transition-all uppercase tracking-tight shadow-lg border-b-4 active:border-b-0 active:translate-y-0.5 ${link.className}`}
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
         </div>
 
         <div className="flex items-center gap-4">
-          <NotificationMenu />
-          <UserNav />
+          <div className="hidden md:flex items-center gap-4">
+            <NotificationMenu />
+            <UserNav />
+          </div>
+
+          {/* Toggle Mobile Menu */}
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="md:hidden p-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all"
+          >
+            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Menu (Collapse) */}
+      {isOpen && (
+        <div className="md:hidden border-t bg-white animate-in slide-in-from-top duration-300">
+          <div className="flex flex-col p-4 gap-4">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setIsOpen(false)}
+                className={`text-center text-xs font-black px-4 py-4 rounded-xl transition-all uppercase tracking-tight shadow-md border-b-4 active:border-b-0 active:translate-y-0.5 ${link.className}`}
+              >
+                {link.label}
+              </Link>
+            ))}
+            <div className="flex items-center justify-around py-2 border-t mt-2">
+              <NotificationMenu />
+              <UserNav />
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   )
 }

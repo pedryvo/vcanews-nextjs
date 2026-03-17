@@ -30,10 +30,16 @@ export class BlogPostRepository {
     return count > 0;
   }
 
-  async getAll() {
+  async getAll(skip?: number, take?: number) {
     return prisma.blogPost.findMany({
+      include: {
+        blog: {
+          include: { cidade: true },
+        },
+      },
       orderBy: { dataPublicacao: "desc" },
-      include: { blog: true },
+      skip,
+      take,
     });
   }
 

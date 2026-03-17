@@ -2,10 +2,16 @@ import { prisma } from "@/lib/db";
 import { Prisma } from "@prisma/client";
 
 export class BlogRepository {
-  async getAll() {
+  async getAll(skip?: number, take?: number) {
     return prisma.blog.findMany({
       include: { cidade: true },
+      skip,
+      take,
     });
+  }
+
+  async count() {
+    return prisma.blog.count();
   }
 
   async getById(id: number) {
