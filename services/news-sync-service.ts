@@ -20,55 +20,70 @@ export class NewsSyncService {
       console.info(`[SYNC] Blogs para processar: ${blogs.length}`);
 
       for (const blog of blogs) {
-        console.info(`[SYNC] > Iniciando Blog: ${blog.nome}`);
+        console.info(`[SYNC] > Blog: ${blog.nome} (ID: ${blog.id})`);
         try {
           const feed = await parser.parseURL(blog.rssUrl);
-          console.info(`[SYNC] RSS OK: ${feed.items?.length || 0} items encontrados`);
+          const items = feed.items || [];
+          console.info(`[SYNC]   - RSS OK: ${items.length} itens`);
 
           let countNew = 0;
-          for (const item of feed.items) {
+          for (const item of items) {
             if (!item.link || !item.title) continue;
 
-            const exists = await blogPostRepository.existsByUrl(item.link);
-            if (exists) continue;
+            // Log de início de processamento do item
+            // console.info(`[SYNC]   - Verificando: ${item.title.substring(0, 30)}...`);
+            
+            try {
+              const startExists = Date.now();
+              const exists = await blogPostRepository.existsByUrl(item.link);
+              // console.info(`[SYNC]     - Exists check: ${Date.now() - startExists}ms`);
+              
+              if (exists) continue;
 
-            countNew++;
-            console.info(`[SYNC]   + Novo post: ${item.title.substring(0, 50)}...`);
+              countNew++;
+              console.info(`[SYNC]   + NOVO: ${item.title.substring(0, 40)}...`);
 
-            let imageUrl = this.extractImageUrlFromRSS(item);
-            let titulo = item.title;
+              let imageUrl = this.extractImageUrlFromRSS(item);
+              let titulo = item.title;
 
-            const needsExtraction = !imageUrl || (titulo && titulo.length < 50);
+              const needsExtraction = !imageUrl || (titulo && titulo.length < 50);
 
-            if (needsExtraction) {
-              try {
-                const article = await extract(item.link);
-                if (article) {
-                  if (!imageUrl && article.image) imageUrl = article.image;
-                  if (article.title && article.title.length > titulo.length) {
-                    titulo = article.title;
+              if (needsExtraction) {
+                try {
+                  // Adicionando um timeout manual para a extração ou apenas logando
+                  // console.info(`[SYNC]     - Extraindo metadados extras...`);
+                  const article = await extract(item.link);
+                  if (article) {
+                    if (!imageUrl && article.image) imageUrl = article.image;
+                    if (article.title && article.title.length > titulo.length) {
+                      titulo = article.title;
+                    }
                   }
+                } catch (e) {
+                  console.warn(`[SYNC]     ! Erro extração: ${item.link}`);
                 }
-              } catch (e) {
-                console.warn(`[SYNC]   ! Erro extração extra (${item.link})`);
               }
+
+              const publishDate = item.pubDate ? new Date(item.pubDate) : new Date();
+
+              const startUpsert = Date.now();
+              await blogPostRepository.upsert({
+                where: { url: item.link },
+                update: { titulo, imageUrl, dataPublicacao: publishDate },
+                create: {
+                  titulo,
+                  url: item.link,
+                  imageUrl,
+                  dataPublicacao: publishDate,
+                  blogId: blog.id,
+                },
+              });
+              // console.info(`[SYNC]     - Upsert OK: ${Date.now() - startUpsert}ms`);
+            } catch (itemError) {
+              console.error(`[SYNC]     !!! ERRO NO ITEM ${item.link}:`, itemError);
             }
-
-            const publishDate = item.pubDate ? new Date(item.pubDate) : new Date();
-
-            await blogPostRepository.upsert({
-              where: { url: item.link },
-              update: { titulo, imageUrl, dataPublicacao: publishDate },
-              create: {
-                titulo,
-                url: item.link,
-                imageUrl,
-                dataPublicacao: publishDate,
-                blogId: blog.id,
-              },
-            });
           }
-          console.info(`[SYNC] > Finalizado Blog: ${blog.nome} (${countNew} novos)`);
+          console.info(`[SYNC] > Sucesso: ${blog.nome} (+${countNew} novos)`);
         } catch (blogError) {
           console.error(`[SYNC] !!! ERRO NO BLOG ${blog.nome}:`, blogError);
         }
