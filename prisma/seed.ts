@@ -1,41 +1,6 @@
 import { prisma } from "../lib/db";
 
 async function main() {
-  // Criar Usuários de Desenvolvimento
-  console.log("Criando usuários dev...");
-  await prisma.user.upsert({
-    where: { id: "dev-user" },
-    update: {
-      name: "Dev Admin (1)",
-      email: "dev@vcanews.com",
-      role: "ADMIN",
-      username: "devadmin",
-    },
-    create: {
-      id: "dev-user",
-      name: "Dev Admin (1)",
-      email: "dev@vcanews.com",
-      role: "ADMIN",
-      username: "devadmin",
-    },
-  });
-
-  await prisma.user.upsert({
-    where: { id: "dev-user-2" },
-    update: {
-      name: "Dev Tester (2)",
-      email: "dev2@vcanews.com",
-      role: "USER",
-      username: "devtester",
-    },
-    create: {
-      id: "dev-user-2",
-      name: "Dev Tester (2)",
-      email: "dev2@vcanews.com",
-      role: "USER",
-      username: "devtester",
-    },
-  });
 
   const categories = [
     {

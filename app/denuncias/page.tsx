@@ -9,11 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AlertTriangle, LogIn } from "lucide-react";
 
 export default function DenunciasPage() {
-  const { data: realSession } = useSession();
-  const isDev = process.env.NODE_ENV === "development";
-  const session = isDev
-    ? { user: { id: "dev-user", name: "Dev Admin", email: "dev@dev.com", role: "ADMIN" } }
-    : realSession;
+  const { data: session } = useSession();
   const [denuncias, setDenuncias] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -31,7 +27,7 @@ export default function DenunciasPage() {
     fetchDenuncias();
   }, [fetchDenuncias]);
 
-  const currentUserId = isDev ? "dev-user" : ((session as any)?.user as any)?.id;
+  const currentUserId = ((session as any)?.user as any)?.id;
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-3xl">

@@ -1,9 +1,6 @@
 import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/db";
-import CredentialsProvider from "next-auth/providers/credentials";
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
-import { join } from "path";
 import { NextAuthOptions } from "next-auth";
 
 export const authOptions: NextAuthOptions = {
@@ -12,36 +9,6 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
-    CredentialsProvider({
-      id: "credentials",
-      name: "Desenvolvimento",
-      credentials: {},
-      async authorize() {
-        if (process.env.NODE_ENV !== "development") return null;
-        
-        const cacheDir = join(process.cwd(), ".next", "cache");
-        const cycleFile = join(cacheDir, "dev-user-cycle.txt");
-        let userId = "dev-user";
-
-        try {
-          if (!existsSync(cacheDir)) mkdirSync(cacheDir, { recursive: true });
-          
-          if (existsSync(cycleFile)) {
-            const lastId = readFileSync(cycleFile, "utf-8").trim();
-            userId = lastId === "dev-user" ? "dev-user-2" : "dev-user";
-          }
-          writeFileSync(cycleFile, userId);
-        } catch (e) {
-          console.error("Erro ao gerenciar ciclo de usuários dev:", e);
-        }
-
-        const devUser = await prisma.user.findUnique({
-          where: { id: userId }
-        });
-
-        return devUser as any;
-      }
     }),
   ],
   session: {
