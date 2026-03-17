@@ -286,35 +286,35 @@ export default function PublicProfilePage({ params }: PublicProfileProps) {
 
           {/* Coluna Direita: Informações Adicionais / Showcase */}
           <div className="lg:col-span-2 space-y-6">
-            <Card className="border-none shadow-xl rounded-[2rem] overflow-hidden group/gallery">
-              <CardHeader className="pb-2 flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle className="text-2xl font-black uppercase tracking-tighter italic">Galeria & Projetos</CardTitle>
-                  <CardDescription className="text-xs font-medium uppercase tracking-widest">Serviços e realizações do profissional</CardDescription>
-                </div>
-                {user.portfolio?.length > 1 && (
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
-                      className="h-8 w-8 rounded-full border-2"
-                      onClick={() => setActiveSlide(prev => (prev === 0 ? user.portfolio.length - 1 : prev - 1))}
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
-                      className="h-8 w-8 rounded-full border-2"
-                      onClick={() => setActiveSlide(prev => (prev === user.portfolio.length - 1 ? 0 : prev + 1))}
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
+            {user.portfolio && user.portfolio.length > 0 && (
+              <Card className="border-none shadow-xl rounded-[2rem] overflow-hidden group/gallery">
+                <CardHeader className="pb-2 flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle className="text-2xl font-black uppercase tracking-tighter italic">Galeria & Projetos</CardTitle>
+                    <CardDescription className="text-xs font-medium uppercase tracking-widest">Serviços e realizações do profissional</CardDescription>
                   </div>
-                )}
-              </CardHeader>
-              <CardContent className="p-6">
-                {user.portfolio && user.portfolio.length > 0 ? (
+                  {user.portfolio?.length > 1 && (
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="icon" 
+                        className="h-8 w-8 rounded-full border-2"
+                        onClick={() => setActiveSlide(prev => (prev === 0 ? user.portfolio.length - 1 : prev - 1))}
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="icon" 
+                        className="h-8 w-8 rounded-full border-2"
+                        onClick={() => setActiveSlide(prev => (prev === user.portfolio.length - 1 ? 0 : prev + 1))}
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                </CardHeader>
+                <CardContent className="p-6">
                   <div className="space-y-4">
                     <div 
                       className="relative aspect-[4/3] rounded-3xl overflow-hidden bg-muted group/item"
@@ -341,19 +341,9 @@ export default function PublicProfilePage({ params }: PublicProfileProps) {
                       </div>
                     </div>
                   </div>
-                ) : (
-                  <div className="h-64 flex flex-col items-center justify-center bg-muted/30 border-2 border-dashed border-muted rounded-3xl text-center space-y-4">
-                    <div className="h-16 w-16 bg-muted rounded-full flex items-center justify-center">
-                      <Camera className="h-8 w-8 text-muted-foreground opacity-20" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Galeria Vazia</p>
-                      <p className="text-[10px] text-muted-foreground/60 max-w-[200px] mx-auto uppercase font-medium">Este profissional ainda não adicionou fotos ao seu portfólio.</p>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </div>
