@@ -50,7 +50,7 @@ export default async function Home() {
         </div>
       </header>
 
-      <ProfileCTA 
+      <ProfileCTA
         show={showProfileCTA}
         title={ctaTitle}
         description={ctaDescription}
@@ -61,8 +61,6 @@ export default async function Home() {
       <ProfessionalGuideCTA />
 
       <MarketplaceCTA session={session} />
-
-      <DenunciaCTA />
 
       {initialNews.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center border-2 border-dashed rounded-3xl">
