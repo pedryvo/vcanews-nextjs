@@ -22,6 +22,12 @@ import { BusLine, processSchedules } from "@/lib/bus";
 import { BusTimeline } from "./BusTimeline";
 import { BusScheduleTable } from "./BusScheduleTable";
 import { Card, CardContent } from "@/components/ui/card";
+import dynamic from "next/dynamic";
+
+const BusMap = dynamic(() => import("./BusMap"), { 
+  ssr: false,
+  loading: () => <div className="w-full h-[400px] bg-muted animate-pulse rounded-2xl flex items-center justify-center text-muted-foreground">Carregando mapa...</div>
+});
 
 interface BusDashboardProps {
   initialLines: BusLine[];
@@ -156,7 +162,8 @@ export function BusDashboard({ initialLines }: BusDashboardProps) {
                />
             </TabsContent>
 
-            <TabsContent value="itinerario">
+            <TabsContent value="itinerario" className="space-y-6">
+              <BusMap itinerary={direction === "ida" ? selectedLine.itineraryIda : selectedLine.itineraryVolta} />
               <BusTimeline itinerary={direction === "ida" ? selectedLine.itineraryIda : selectedLine.itineraryVolta} />
             </TabsContent>
           </Tabs>
