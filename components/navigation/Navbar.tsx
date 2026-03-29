@@ -40,6 +40,12 @@ export function Navbar() {
       activeClassName: "bg-orange-600 text-white border-orange-800 translate-y-0.5 border-b-0",
     },
     {
+      href: "/buzu",
+      label: "HORÁRIO DE ÔNIBUS",
+      className: "bg-purple-600 hover:bg-purple-700 text-white border-purple-800",
+      activeClassName: "bg-purple-700 text-white border-purple-900 translate-y-0.5 border-b-0",
+    },
+    {
       href: "/contato",
       label: "FALE CONOSCO",
       className: "bg-emerald-500 hover:bg-emerald-600 text-white border-emerald-700",

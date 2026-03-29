@@ -10,7 +10,7 @@ import {
   SheetTitle, 
   SheetTrigger 
 } from "@/components/ui/sheet";
-import { Menu, MessageSquare, ShoppingBag, User as UserIcon, Settings, LayoutDashboard, LogOut } from "lucide-react";
+import { Menu, MessageSquare, ShoppingBag, User as UserIcon, Settings, LayoutDashboard, LogOut, Bus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSession, signOut } from "next-auth/react";
 import { NavItem } from "./NavItem";
@@ -51,6 +51,13 @@ export function SidebarMenu() {
         <div className="flex-1 overflow-y-auto py-6 px-4 space-y-6">
           <div className="space-y-1">
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 px-4 mb-2">Atividade</p>
+            <NavItem 
+              href="/buzu" 
+              label="Horário de Ônibus" 
+              icon={Bus} 
+              variant="sidebar" 
+              onClick={() => setOpen(false)} 
+            />
             <NavItem 
               href="/mensagens" 
               label="Minhas Mensagens" 
