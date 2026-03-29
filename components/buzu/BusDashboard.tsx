@@ -94,23 +94,23 @@ export function BusDashboard({ initialLines }: BusDashboardProps) {
       {selectedLine && (
         <div className="grid gap-6 animate-in slide-in-from-bottom-4 duration-500">
           <Tabs defaultValue="horarios" onValueChange={setActiveTab} className="w-full">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
-              <TabsList className="bg-muted p-1 rounded-xl shadow-inner h-12">
-                <TabsTrigger value="horarios" className="rounded-lg px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all flex items-center gap-2">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 px-1">
+              <TabsList className="bg-muted p-1 rounded-xl shadow-inner h-12 w-full max-w-[400px] flex">
+                <TabsTrigger value="horarios" className="flex-1 rounded-lg px-2 sm:px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all flex items-center justify-center gap-2">
                   <Clock size={16} /> Horários
                 </TabsTrigger>
-                <TabsTrigger value="itinerario" className="rounded-lg px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all flex items-center gap-2">
+                <TabsTrigger value="itinerario" className="flex-1 rounded-lg px-2 sm:px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all flex items-center justify-center gap-2">
                   <MapPin size={16} /> Itinerário
                 </TabsTrigger>
               </TabsList>
 
               {/* Direction Toggle - Only show for Itinerary */}
               {activeTab === "itinerario" && (
-                <div className="flex bg-muted p-1 rounded-xl shadow-inner h-12 animate-in fade-in zoom-in-95 duration-300">
+                <div className="flex bg-muted p-1 rounded-xl shadow-inner h-12 animate-in fade-in zoom-in-95 duration-300 w-full max-w-[400px]">
                   <button
                     onClick={() => setDirection("ida")}
                     className={cn(
-                      "px-6 rounded-lg text-sm font-medium transition-all flex items-center gap-2",
+                      "flex-1 px-4 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2",
                       direction === "ida" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                     )}
                   >
@@ -119,7 +119,7 @@ export function BusDashboard({ initialLines }: BusDashboardProps) {
                   <button
                     onClick={() => setDirection("volta")}
                     className={cn(
-                      "px-6 rounded-lg text-sm font-medium transition-all flex items-center gap-2",
+                      "flex-1 px-4 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2",
                       direction === "volta" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                     )}
                   >
@@ -130,27 +130,27 @@ export function BusDashboard({ initialLines }: BusDashboardProps) {
             </div>
 
             <TabsContent value="horarios">
-               <div className="flex gap-2 mb-4 overflow-x-auto pb-2 scrollbar-none">
+               <div className="flex flex-wrap gap-2 mb-4">
                 <Button 
                   variant={dayType === "week" ? "default" : "outline"} 
                   onClick={() => setDayType("week")}
-                  className="rounded-full px-6"
+                  className="rounded-full px-3 sm:px-6 text-xs sm:text-sm flex-1 min-w-0"
                 >
-                  Segunda a Sexta
+                  Seg a Sexta
                 </Button>
                 <Button 
                   variant={dayType === "sat" ? "default" : "outline"} 
                   onClick={() => setDayType("sat")}
-                  className="rounded-full px-6"
+                  className="rounded-full px-3 sm:px-6 text-xs sm:text-sm flex-1 min-w-0"
                 >
                   Sábado
                 </Button>
                 <Button 
                   variant={dayType === "sun" ? "default" : "outline"} 
                   onClick={() => setDayType("sun")}
-                  className="rounded-full px-6"
+                  className="rounded-full px-3 sm:px-6 text-xs sm:text-sm flex-1 min-w-0"
                 >
-                  Domingo / Feriado
+                  Dom / Feriado
                 </Button>
                </div>
                <BusScheduleTable 

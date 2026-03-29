@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Megaphone, ShoppingBag, Users, User } from "lucide-react";
+import { Home, Megaphone, ShoppingBag, Bus, User } from "lucide-react";
 import { NavItem } from "./NavItem";
 import { usePathname } from "next/navigation";
 
@@ -31,7 +31,6 @@ export function BottomNavigation() {
           label="Denúncias" 
           icon={Megaphone} 
           variant="mobile-bottom" 
-          highlight={true}
         />
 
         <NavItem 
@@ -42,9 +41,9 @@ export function BottomNavigation() {
         />
 
         <NavItem 
-          href="/profissionais" 
-          label="Profs" 
-          icon={Users} 
+          href="/buzu" 
+          label="Ônibus" 
+          icon={Bus} 
           variant="mobile-bottom" 
         />
 

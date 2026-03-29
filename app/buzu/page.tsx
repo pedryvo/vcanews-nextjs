@@ -13,7 +13,7 @@ export default async function BuzuPage() {
   const lines = await fetchBusLines();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Hero Header Section */}
       <div className="relative overflow-hidden bg-primary/5 py-16 mb-8 border-b border-muted">
         {/* Background Patterns */}
@@ -47,7 +47,7 @@ export default async function BuzuPage() {
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 pb-20">
+      <div className="container mx-auto px-4 pb-20 overflow-x-hidden">
         <BusDashboard initialLines={lines} />
         
         {/* Footer Info Section */}
